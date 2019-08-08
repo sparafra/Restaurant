@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity
                             String par = "idLocale=1&Mail=" + mail;
                             System.out.println(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
                             String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
+                            System.out.println(tmpJSON);
                             JSONArray jsonArray = new JSONArray(tmpJSON);
                             if (jsonArray.length() > 0) {
                                 JSONObject obj = jsonArray.getJSONObject(0);
@@ -130,23 +131,19 @@ public class MainActivity extends AppCompatActivity
                                 UserLogged.setNome(obj.getString("Nome"));
                                 UserLogged.setIndirizzo(obj.getString("Indirizzo"));
                                 UserLogged.setNumeroTelefono(obj.getString("NumeroTelefono"));
-                                if (obj.getString("Confermato").equals("0")) {
-                                    UserLogged.setConfermato(false);
-                                } else {
-                                    UserLogged.setConfermato(true);
-                                }
-                                if (obj.getString("Amministratore").equals("0")) {
-                                    UserLogged.setAmministratore(false);
-                                } else {
-                                    UserLogged.setAmministratore(true);
-                                }
+                                UserLogged.setConfermato(obj.getBoolean("Confermato"));
+                                UserLogged.setAmministratore(obj.getBoolean("Amministratore"));
+
                                 UserLogged.setIdLocale(obj.getLong("idLocale"));
+                                UserLogged.setDisabilitato(obj.getBoolean("Disabilitato"));
+                                /*
                                 if (obj.getString("Disabilitato").equals("0")) {
                                     UserLogged.setDisabilitato(false);
 
                                 } else {
                                     UserLogged.setDisabilitato(true);
                                 }
+                                */
                                 System.out.println(UserLogged.getPassword());
                                 System.out.println(txtPassword.getText().toString());
                                 if(UserLogged.getPassword().equals(txtPassword.getText().toString().trim()) && UserLogged.getConfermato() == true && UserLogged.getDisabilitato() == false) {

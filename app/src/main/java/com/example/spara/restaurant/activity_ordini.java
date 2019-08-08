@@ -203,73 +203,65 @@ public class activity_ordini extends AppCompatActivity
         try {
             OrderList = new ArrayList<>();
             JSONArray jsonArray = new JSONArray(json);
+            System.out.println(jsonArray.toString());
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
+                System.out.println(obj.toString());
 
-                boolean presente = false;
-                for (int k = 0; k < OrderList.size() && !presente; k++) {
-                    if (OrderList.get(k).getId() == obj.getInt("idOrdine"))
-                        presente = true;
+                Order O = new Order();
+                O.setId(obj.getInt("idOrdine"));
+                O.setStato(obj.getString("Stato"));
+                if (obj.getBoolean("Asporto") == false) {
+                    O.setAsporto(false);
+                } else {
+                    O.setAsporto(true);
+                }
+                O.setNumeroTelefono(obj.getString("NumeroTelefono"));
+
+                SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
+                SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+                Date d1 = null;
+                try {
+                    d1 = sdf3.parse(obj.getString("DataOra"));
+                } catch (Exception e) {
+                    d1 = sdf4.parse(obj.getString("DataOra"));
+                }
+                O.setDateTime(d1);
+                System.out.println(O.getDateTime());
+                System.out.println(obj.getString("DataOra"));
+                JSONArray products = obj.getJSONArray("Products");
+                System.out.println(products.toString());
+
+                List<Product> listProductsOrder = new ArrayList<>();
+                for (int k = 0; k < products.length(); k++) {
+                    JSONObject product = products.getJSONObject(k);
+
+                    System.out.println(products.toString());
+                    Product P = new Product();
+                    P.setId(product.getInt("idProdotto"));
+                    P.setPrezzo(Float.parseFloat(product.getString("Price")));
+                    P.setImageURL(product.getString("ImageURL"));
+                    P.setTipo(product.getString("Type"));
+                    P.setNome(product.getString("Name"));
+
+                    JSONArray ingredients = product.getJSONArray("Ingredients");
+                    List<Ingredient> listIngredient = new ArrayList<>();
+                    for (int j = 0; j < ingredients.length(); j++) {
+                        JSONObject ingredient = ingredients.getJSONObject(j);
+
+                        Ingredient I = new Ingredient();
+                        I.setId(Integer.parseInt(ingredient.getString("idIngredient")));
+                        I.setNome(ingredient.getString("Name"));
+                        I.setPrezzo(Float.parseFloat(ingredient.getString("Price")));
+                        listIngredient.add(I);
+
+                    }
+                    P.setListIngredienti(listIngredient);
+                    listProductsOrder.add(P);
                 }
 
-                if (!presente) {
-                    Order O = new Order();
-                    O.setId(obj.getInt("idOrdine"));
-                    O.setStato(obj.getString("Stato"));
-                    if (obj.getInt("Asporto") == 0) {
-                        O.setAsporto(false);
-                    } else {
-                        O.setAsporto(true);
-                    }
-                    O.setNumeroTelefono(obj.getString("NumeroTelefono"));
-
-                    SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
-                    Date d1 = null;
-                    try {
-                        d1 = sdf3.parse(obj.getString("DataOra"));
-                    } catch (Exception e) {
-                    }
-                    O.setDateTime(d1);
-
-                    List<Product> listProductsOrder = new ArrayList<>();
-                    for (int k = 0; k < jsonArray.length(); k++) {
-                        JSONObject tmpobj = jsonArray.getJSONObject(k);
-                        boolean presentetmp = false;
-                        for (int j = 0; j < listProductsOrder.size() && !presentetmp; j++) {
-                            if (listProductsOrder.get(j).getId() == tmpobj.getInt("idProdotto"))
-                                presentetmp = true;
-                        }
-
-                        if (!presentetmp) {
-                            if (tmpobj.getInt("idOrdine") == O.getId()) {
-                                Product P = new Product();
-                                P.setId(Integer.parseInt(tmpobj.getString("idProdotto")));
-                                P.setPrezzo(Float.parseFloat(tmpobj.getString("PrezzoProdotto")));
-                                P.setImageURL(tmpobj.getString("ImageURL"));
-                                P.setTipo(tmpobj.getString("TipoProdotto"));
-                                P.setNome(tmpobj.getString("NomeProdotto"));
-
-                                List<Ingredient> listIngredient = new ArrayList<>();
-                                for (int j = 0; j < jsonArray.length(); j++) {
-                                    JSONObject tmpobj1 = jsonArray.getJSONObject(j);
-                                    if (P.getId() == tmpobj1.getInt("idProdotto") && O.getId() == tmpobj1.getInt("idOrdine")) {
-                                        Ingredient I = new Ingredient();
-                                        I.setId(Integer.parseInt(tmpobj1.getString("idIngrediente")));
-                                        I.setNome(tmpobj1.getString("NomeIngrediente"));
-                                        I.setPrezzo(Float.parseFloat(tmpobj1.getString("PrezzoIngrediente")));
-                                        listIngredient.add(I);
-                                    }
-                                }
-                                P.setListIngredienti(listIngredient);
-                                listProductsOrder.add(P);
-                            }
-                        }
-
-                    }
-                    O.setListProducts(listProductsOrder);
-                    OrderList.add(O);
-
-                }
+                O.setListProducts(listProductsOrder);
+                OrderList.add(O);
 
             }
         }catch (Exception e){e.printStackTrace();}
