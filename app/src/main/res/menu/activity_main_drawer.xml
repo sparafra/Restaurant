@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/baseline_home_24"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_gestione_ordini"
+            android:icon="@drawable/baseline_shopping_basket_24"
+            android:title="Gestione Ordini"
+            android:visible="false"/>
+        <item
+            android:id="@+id/nav_ordini"
+            android:icon="@drawable/baseline_shopping_basket_24"
+            android:title="Ordini" />
+        <item
+            android:id="@+id/nav_carrello"
+            android:icon="@drawable/baseline_shopping_cart_24"
+            android:title="Carrello" />
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/baseline_pin_drop_24"
+            android:title="Trovaci sulla mappa" />
+        <item
+            android:id="@+id/nav_account"
+            android:icon="@drawable/baseline_person_24"
+            android:title="Il mio account" />
+        <item
+            android:id="@+id/nav_chiamaci"
+            android:icon="@drawable/baseline_phone_24"
+            android:title="Chiamaci" />
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@drawable/baseline_exit_to_app_24"
+            android:title="Exit" />
+    </group>
+
+    <!--
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send"
+                android:iconTint="#ffff" />
+        </menu>
+    </item>
+    -->
+</menu>

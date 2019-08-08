@@ -1,0 +1,590 @@
+package com.example.spara.restaurant;
+
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Bundle;
+import android.os.StrictMode;
+import com.google.android.material.navigation.NavigationView;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class activity_home extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+    ListView list;
+
+    ArrayList<Product> listProducts;
+    int posSelected = -1;
+    boolean pizzeSelected = false;
+    Cart cartProducts;
+    User UserLogged;
+    WebConnection Connection;
+    ProgressDialog pd;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        /* //Mail Floating Action
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+        */
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_home);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //MY CODE
+
+        //Get INTENT Extra
+        cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
+        UserLogged = (User) getIntent().getParcelableExtra("User");
+        Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
+
+        //Listview declaration
+        list = (ListView) findViewById(R.id.list);
+
+        //Background Image
+        ImageView imgTransparent = findViewById(R.id.imageView);
+        imgTransparent.setAlpha(230);
+
+        //Image and Button declaration
+        ImageView imgProduct = findViewById(R.id.imgProdotto);
+        ImageView btnPaniniFritti = findViewById(R.id.Panini_Fritti);
+        ImageView btnPizze = findViewById(R.id.Pizze);
+        ImageView btnSalad = findViewById(R.id.Salad);
+        ImageView btnAddCart = findViewById(R.id.addCart);
+
+        //Starting background service
+        Intent I1 = new Intent(activity_home.this, Background.class);
+        I1.putExtra("UserNumber", UserLogged.getNumeroTelefono());
+        //I.putExtra("WebConnection" ,Connection);
+        startService(I1);
+
+        //User Confirm Control
+        if(!UserLogged.getConfermato())
+        {
+            Toast.makeText(getApplicationContext(), "ATTENZIONE: Utente non confermato. Effettua la conferma tramite la mail ricevuta per poter creare i tuoi ordini", Toast.LENGTH_LONG).show();
+        }
+        if(UserLogged.getAmministratore())
+        {
+            navigationView.getMenu().findItem(R.id.nav_gestione_ordini).setVisible(true);
+        }
+
+
+        //ListView click on item event
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setSelected(true);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Stuff that updates the UI
+                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                        animation1.setDuration(2000);
+                        view.startAnimation(animation1);                    }
+                });
+
+                posSelected = position;
+                if(posSelected == 0 && pizzeSelected)
+                {
+                    Intent I = new Intent(activity_home.this, activity_personalizza.class);
+                    I.putExtra("Cart", cartProducts);
+                    I.putExtra("User", UserLogged);
+                    I.putExtra("WebConnection" ,Connection);
+                    startActivity(I);
+                    activity_home.this.finish();
+                }
+                else {
+                    if (pizzeSelected) {
+                        System.out.println(listProducts.get(position - 1).getImageURL());
+                        if (listProducts.get(position - 1).getImageURL().equals("null"))
+                        {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Stuff that updates the UI
+                                    imgProduct.setImageResource(R.drawable.logo);
+                                    Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                                    animation1.setDuration(2000);
+                                    imgProduct.startAnimation(animation1);                    }
+                            });
+                        }
+                        else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Stuff that updates the UI
+                                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listProducts.get(position - 1).getImageURL()));
+                                    Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listProducts.get(position - 1).getImageURL())).into(imgProduct);
+                                    Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                                    animation1.setDuration(2000);
+                                    imgProduct.startAnimation(animation1);                    }
+                            });
+                        }
+                    } else {
+                        if (listProducts.get(position).getImageURL().equals("null"))
+                            imgProduct.setImageResource(R.drawable.logo);
+                        else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Stuff that updates the UI
+                                    Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listProducts.get(position).getImageURL())).into(imgProduct);
+                                    Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                                    animation1.setDuration(2000);
+                                    imgProduct.startAnimation(animation1);                    }
+                            });
+                        }
+                    }
+
+                    HashMap<String, String> Map = (HashMap) parent.getItemAtPosition(position);
+                    String selectedItem = Map.get("First Line");
+                    //Toast.makeText(getApplicationContext(), selectedItem, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //Buttons click event
+        btnPaniniFritti.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Stuff that updates the UI
+                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                        animation1.setDuration(2000);
+                        v.startAnimation(animation1);                    }
+                });
+
+                pizzeSelected = false;
+
+                showLoadingDialog();
+                new Thread(new Runnable() {
+                    public void run() {
+                        String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.BURGERFRIESINGREDIENTS));
+                        fillProductsList(tmpJSON);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Stuff that updates the UI
+                                loadIntoListView(listProducts);
+                                pd.dismiss();
+                            }
+                        });
+                    }
+                }).start();
+
+            }
+        });
+
+        btnPizze.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Stuff that updates the UI
+                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                        animation1.setDuration(2000);
+                        v.startAnimation(animation1);                    }
+                });
+                pizzeSelected = true;
+                showLoadingDialog();
+                new Thread(new Runnable() {
+                    public void run() {
+
+                        String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.PIZZEINGREDIENTS));
+                        fillProductsList(tmpJSON);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Stuff that updates the UI
+                                loadIntoListView(listProducts);
+                                pd.dismiss();
+                            }
+                        });
+                    }
+                }).start();
+
+            }
+        });
+
+        btnSalad.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Stuff that updates the UI
+                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                        animation1.setDuration(2000);
+                        v.startAnimation(animation1);                    }
+                });
+
+                pizzeSelected = false;
+                showLoadingDialog();
+                new Thread(new Runnable() {
+                    public void run() {
+                        String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SALADSINGREDIENTS));
+                        fillProductsList(tmpJSON);
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                // Stuff that updates the UI
+                                loadIntoListView(listProducts);
+                                pd.dismiss();
+                            }
+                        });
+                    }
+                }).start();
+                //loadIntoListView(listProducts);
+            }
+        });
+
+        btnAddCart.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Stuff that updates the UI
+                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                        animation1.setDuration(1000);
+
+                        btnAddCart.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+                        v.startAnimation(animation1);
+                        animation1.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                btnAddCart.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
+
+                            }
+                        });
+                    }
+                });
+
+                if(posSelected != -1) {
+                    if(pizzeSelected)
+                    {
+                        cartProducts.addProduct(listProducts.get(posSelected-1));
+                        Toast.makeText(getApplicationContext(), listProducts.get(posSelected-1).getNome() + " aggiunto al carrello", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        cartProducts.addProduct(listProducts.get(posSelected));
+                        Toast.makeText(getApplicationContext(), listProducts.get(posSelected).getNome() + " aggiunto al carrello", Toast.LENGTH_SHORT).show();
+                    }
+                    posSelected = -1;
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "Seleziona un Prodotto", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnPizze.callOnClick();
+
+    }
+    private String downloadJSON(final String urlWebService) {
+
+        try {
+            URL url = new URL(urlWebService);
+            System.out.println(urlWebService);
+
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            StringBuilder sb = new StringBuilder();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String json;
+            while ((json = bufferedReader.readLine()) != null) {
+                sb.append(json + "\n");
+            }
+            return sb.toString().trim();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    private void showLoadingDialog() {
+        pd = new ProgressDialog(this, R.style.DialogTheme);
+        pd.setTitle("Loading...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
+        pd.show();
+    }
+    private void loadIntoListView(ArrayList<Product> listP)
+    {
+        List<HashMap<String, String>> listitems = new ArrayList<>();
+        SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
+
+        if(listP.size() > 0 && listP.get(0).getTipo().equals("Pizza")) {
+            HashMap<String, String> tmp = new HashMap<>();
+            tmp.put("First Line", "Personalizza la tua pizza!");
+            listitems.add(tmp);
+        }
+
+        List<Ingredient> listI;
+        for(int k=0; k<listP.size(); k++)
+        {
+            HashMap<String, String> resultMap = new HashMap<>();
+            listI = listP.get(k).getListIngredienti();
+            resultMap.put("First Line", listP.get(k).getNome());
+            String Ingredienti = "";
+            for(int i=0; i<listI.size(); i++)
+            {
+                if(!listI.get(i).getNome().equals("null")) {
+                    if (Ingredienti.equals("")) {
+                        Ingredienti += listI.get(i).getNome();
+                    } else {
+                        Ingredienti += ", " + listI.get(i).getNome();
+                    }
+                }
+            }
+            Ingredienti += " €" + listP.get(k).getPrezzo();
+            resultMap.put("Second Line", Ingredienti);
+            listitems.add(resultMap);
+        }
+        list.setAdapter(adapter);
+    }
+    private void fillProductsList(String json)
+    {
+        try {
+            System.out.println(json);
+            listProducts = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(json);
+            String[][] stocks = new String[jsonArray.length()][2];
+            StringBuilder Ingredienti;
+            int nProdotti = 0;
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                boolean presente = false;
+                JSONObject obj = jsonArray.getJSONObject(i);
+                Product P = new Product();
+                Ingredienti = new StringBuilder();
+                for (int k = 0; k < stocks.length && !presente; k++) {
+                    if (obj.getString("Name").equals(stocks[k][0])) {
+                        presente = true;
+                    }
+                }
+                if (!presente) {
+                    P.setId(Integer.parseInt(obj.getString("id")));
+                    P.setPrezzo(Float.parseFloat(obj.getString("Price")));
+                    P.setTipo(obj.getString("Type"));
+                    P.setNome(obj.getString("Name"));
+                    P.setImageURL(obj.getString("ImageURL"));
+                    stocks[nProdotti][0] = obj.getString("Name");
+                    String prezzo = obj.getString("Price");
+
+                    int nIngredienti = 0;
+                    List<Ingredient> listIngredients = new ArrayList<>();
+                    for (int k = 0; k < jsonArray.length(); k++) {
+                        JSONObject tmpobj = jsonArray.getJSONObject(k);
+                        Ingredient I = new Ingredient();
+                        if (tmpobj.getString("Name").equals(stocks[nProdotti][0])) {
+                            if (nIngredienti == 0) {
+                                Ingredienti.append(tmpobj.getString("Name"));
+                            } else {
+                                Ingredienti.append(", " + tmpobj.getString("Name"));
+                            }
+                            I.setId(Integer.parseInt(tmpobj.getString("id")));
+                            I.setNome(tmpobj.getString("Name"));
+                            I.setPrezzo(Float.parseFloat(tmpobj.getString("Price")));
+                            listIngredients.add(I);
+                            nIngredienti++;
+                        }
+                    }
+                    if (nIngredienti == 1 && Ingredienti.toString().equals("null")) {
+                        Ingredienti.delete(0, Ingredienti.length());
+                        Ingredienti.append("€" + prezzo);
+                    } else {
+                        Ingredienti.append(" €" + prezzo);
+                    }
+                    stocks[nProdotti][1] = Ingredienti.toString().trim();
+                    nProdotti++;
+                    P.setListIngredienti(listIngredients);
+                    listProducts.add(P);
+                }
+            }
+
+        }catch (Exception e){e.printStackTrace();}
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_home);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_home)
+        {
+            // Handle the camera action
+
+        }
+        else if (id == R.id.nav_ordini)
+        {
+            Intent I = new Intent(activity_home.this, activity_ordini.class);
+            I.putExtra("Cart", cartProducts);
+            I.putExtra("User", UserLogged);
+            I.putExtra("WebConnection" ,Connection);
+            startActivity(I);
+            activity_home.this.finish();
+        }
+        else if (id == R.id.nav_gestione_ordini)
+        {
+            Intent I = new Intent(activity_home.this, activity_gestione_ordini.class);
+            I.putExtra("Cart", cartProducts);
+            I.putExtra("User", UserLogged);
+            I.putExtra("WebConnection" ,Connection);
+            startActivity(I);
+            activity_home.this.finish();
+        }
+        else if (id == R.id.nav_carrello)
+        {
+            Intent I = new Intent(activity_home.this, activity_carrello.class);
+            I.putExtra("Cart", cartProducts);
+            I.putExtra("User", UserLogged);
+            I.putExtra("WebConnection" ,Connection);
+            startActivity(I);
+            //startActivity(new Intent(activity_home.this, activity_carrello.class));
+            activity_home.this.finish();
+        }
+        else if (id == R.id.nav_map)
+        {
+            Intent I = new Intent(activity_home.this, activity_map.class);
+            I.putExtra("Cart", cartProducts);
+            I.putExtra("User", UserLogged);
+            I.putExtra("WebConnection" ,Connection);
+            startActivity(I);
+            activity_home.this.finish();
+        }
+        else if (id == R.id.nav_account)
+        {
+
+        }
+        else if (id == R.id.nav_chiamaci)
+        {
+
+        }
+        else if (id == R.id.nav_exit)
+        {
+            savePreferences("", "", "");
+            startActivity(new Intent(activity_home.this, MainActivity.class));
+            activity_home.this.finish();
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_home);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+    private void savePreferences(String NumeroTelefono, String Mail, String Password) {
+        SharedPreferences settings = getSharedPreferences("alPachino",
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+
+        // Edit and commit
+        editor.putString("NumeroTelefono", NumeroTelefono);
+        editor.putString("Mail", Mail);
+        editor.putString("Password", Password);
+        editor.commit();
+    }
+}
