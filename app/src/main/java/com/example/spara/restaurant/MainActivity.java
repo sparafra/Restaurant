@@ -120,7 +120,8 @@ public class MainActivity extends AppCompatActivity
                             String par = "idLocale=1&Mail=" + mail;
                             System.out.println(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
                             String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
-                            System.out.println(tmpJSON);
+                            System.out.println("--" + tmpJSON);
+
                             JSONArray jsonArray = new JSONArray(tmpJSON);
                             if (jsonArray.length() > 0) {
                                 JSONObject obj = jsonArray.getJSONObject(0);
@@ -394,6 +395,7 @@ public class MainActivity extends AppCompatActivity
             }
             return sb.toString();
         } catch (Exception e) {
+            System.out.println(e.toString());
             return "";
         }
 

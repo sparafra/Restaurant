@@ -50,6 +50,8 @@ public class activity_signin extends AppCompatActivity
     TextView Nome;
     TextView Cognome;
     TextView Indirizzo;
+    TextView Citta;
+    TextView Cap;
     TextView NumeroTelefono;
 
     @Override
@@ -99,6 +101,8 @@ public class activity_signin extends AppCompatActivity
         Nome = findViewById(R.id.Nome);
         Cognome = findViewById(R.id.Cognome);
         Indirizzo = findViewById(R.id.Indirizzo);
+        Citta = findViewById(R.id.Citta);
+        Cap = findViewById(R.id.Cap);
         NumeroTelefono = findViewById(R.id.NumeroTelefono);
 
         //Background Image Declaration
@@ -116,6 +120,8 @@ public class activity_signin extends AppCompatActivity
                 String nome = Nome.getText().toString();
                 String cognome = Cognome.getText().toString();
                 String indirizzo = Indirizzo.getText().toString();
+                String citta = Citta.getText().toString();
+                String cap = Cap.getText().toString();
                 String numeroTelefono = NumeroTelefono.getText().toString();
 
                 /*
@@ -145,7 +151,9 @@ public class activity_signin extends AppCompatActivity
                             try {
                                 Connection = new WebConnection();
 
-                                User U = new User(numeroTelefono, nome, cognome, mail, indirizzo, password, false, false, (long)1, false);
+                                String IndirizzoCompleto = Indirizzo + ", " + cap + ", " + citta;
+
+                                User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, (long)1, false);
 
                                 String par = "NumeroTelefono=" + U.getNumeroTelefono() + "&Mail=null";
                                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
@@ -245,6 +253,16 @@ public class activity_signin extends AppCompatActivity
                     {
                         Indirizzo.setTextColor(Color.RED);
                         Toast.makeText(getApplicationContext(), "Inserire il tuo indirizzo", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(Citta.equals(getString(R.string.SampleCittà)) || indirizzo.equals(""))
+                    {
+                        Citta.setTextColor(Color.RED);
+                        Toast.makeText(getApplicationContext(), "Inserire la tua città", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(Cap.equals(getString(R.string.SampleCap)) || indirizzo.equals(""))
+                    {
+                        Cap.setTextColor(Color.RED);
+                        Toast.makeText(getApplicationContext(), "Inserire il tuo cap", Toast.LENGTH_SHORT).show();
                     }
                     else if(numeroTelefono.equals(getString(R.string.SampleTelefono)) || numeroTelefono.equals(""))
                     {
@@ -412,6 +430,48 @@ public class activity_signin extends AppCompatActivity
                 else
                 {
                     Indirizzo.setTextColor(Color.WHITE);
+                }
+            }
+        });
+        Citta.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!Citta.getText().toString().equals("") && Citta.getText().toString().equals(getString(R.string.SampleCittà))) {
+                    Citta.setText("");
+                    Citta.setTextColor(Color.WHITE);
+                }
+                if (!hasFocus) {
+                    if(Citta.getText().toString().equals(""))
+                    {
+                        Citta.setText(getString(R.string.SampleCittà));
+                        Citta.setTextColor(Color.WHITE);
+                    }
+                }
+                else
+                {
+                    Citta.setTextColor(Color.WHITE);
+                }
+            }
+        });
+        Cap.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!Cap.getText().toString().equals("") && Cap.getText().toString().equals(getString(R.string.SampleCap))) {
+                    Cap.setText("");
+                    Cap.setTextColor(Color.WHITE);
+                }
+                if (!hasFocus) {
+                    if(Cap.getText().toString().equals(""))
+                    {
+                        Cap.setText(getString(R.string.SampleCap));
+                        Cap.setTextColor(Color.WHITE);
+                    }
+                }
+                else
+                {
+                    Cap.setTextColor(Color.WHITE);
                 }
             }
         });
