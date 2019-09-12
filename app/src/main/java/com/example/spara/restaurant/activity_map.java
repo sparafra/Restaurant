@@ -244,6 +244,7 @@ public class activity_map extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        pd.dismiss();
     }
 
     @Override

@@ -12,11 +12,11 @@ public class Order {
     String NumeroTelefono;
     float Costo;
     List<Product> listProducts;
-
+    boolean Pagato;
 
     Date DateTime;
 
-    public Order(){listProducts = new ArrayList<>(); Costo =0;}
+    public Order(){listProducts = new ArrayList<>(); Costo =0; Pagato = false;}
 
 
     public void addProduct(Product P)
@@ -61,7 +61,8 @@ public class Order {
         this.listProducts = listProducts;
     }
     public void setCosto(float Costo){this.Costo = Costo;}
-
+    public void setPagato(boolean Pagato){this.Pagato = Pagato;}
+    public boolean getPagato(){return Pagato;}
     @Override
     public boolean equals(Object obj) {
         Order o = (Order) obj;
@@ -75,7 +76,7 @@ public class Order {
             float Tot=0;
             for(int k=0; k<listProducts.size(); k++)
             {
-                Tot += listProducts.get(k).getPrezzo();
+                Tot += listProducts.get(k).getPrezzo()*listProducts.get(k).getQuantity();
             }
             return  Tot;
         }

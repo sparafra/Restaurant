@@ -20,6 +20,18 @@
         app:srcCompat="@color/colorPrimaryDark"
         tools:srcCompat="@color/TransparentColor" />
 
+    <ImageView
+        android:id="@+id/deleteOrder"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/baseline_delete_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listProdotti" />
+
     <ListView
         android:id="@+id/listProducts"
         android:layout_width="match_parent"
@@ -108,9 +120,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="8dp"
-        android:text="Domicilio  "
         android:enabled="false"
+        android:text="Domicilio  "
         android:textColor="@drawable/White"
+        android:theme="@style/SwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/Indirizzo"
         app:layout_constraintTop_toBottomOf="@+id/Nominativo" />

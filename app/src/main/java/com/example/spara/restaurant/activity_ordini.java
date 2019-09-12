@@ -111,6 +111,7 @@ public class activity_ordini extends AppCompatActivity
         new Thread(new Runnable() {
             public void run() {
                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSER, par));
+                System.out.println(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSER, par));
                 fillOrderList(tmpJSON);
                 runOnUiThread(new Runnable() {
 
@@ -243,6 +244,7 @@ public class activity_ordini extends AppCompatActivity
                     P.setImageURL(product.getString("ImageURL"));
                     P.setTipo(product.getString("Type"));
                     P.setNome(product.getString("Name"));
+                    P.setQuantity(product.getInt("Quantity"));
 
                     JSONArray ingredients = product.getJSONArray("Ingredients");
                     List<Ingredient> listIngredient = new ArrayList<>();
@@ -281,7 +283,6 @@ public class activity_ordini extends AppCompatActivity
             String s = sdf3.format(D);
             //String s = String.valueOf(D.getDay()) + "/" + String.valueOf(D.getMonth()) + "/" + String.valueOf(D.getYear()) + " " + String.valueOf(D.getHours()) + ":" + String.valueOf(D.getMinutes());
             resultMap.put("First Line", "Id: " + String.valueOf(OrderList.get(k).getId()) + " Data: " + s + " Costo: €" + String.valueOf(OrderList.get(k).getTotaleCosto()));
-
             resultMap.put("Second Line", "");
             listitems.add(resultMap);
         }
@@ -296,7 +297,7 @@ public class activity_ordini extends AppCompatActivity
     private void loadIntoProductListView(List<Product> listP)
     {
         List<HashMap<String, String>> listitems = new ArrayList<>();
-        SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
+        SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item_with_quantity, new String[]{"First Line", "Quantity", "Second Line"}, new int[]{R.id.text1, R.id.quantity, R.id.text2});
 
         List<Ingredient> listI;
         for(int k=0; k<listP.size(); k++)
@@ -316,6 +317,7 @@ public class activity_ordini extends AppCompatActivity
                 }
             }
             Ingredienti += " €" + listP.get(k).getPrezzo();
+            resultMap.put("Quantity", "x"+String.valueOf(listP.get(k).getQuantity()));
             resultMap.put("Second Line", Ingredienti);
             listitems.add(resultMap);
         }

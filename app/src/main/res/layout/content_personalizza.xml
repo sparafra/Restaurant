@@ -24,65 +24,33 @@
         android:id="@+id/listIngredienti"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView" />
-
-    <ImageView
-        android:id="@+id/addIgredient"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text=""
-        app:srcCompat="@drawable/baseline_add_circle_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listIngredienti" />
+        app:layout_constraintTop_toBottomOf="@+id/indietro" />
 
     <ListView
         android:id="@+id/listIngredientiScelti"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="0dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addIgredient" />
+        app:layout_constraintTop_toBottomOf="@+id/listIngredienti" />
 
     <Button
         android:id="@+id/salva"
-        android:layout_width="150dp"
+        android:layout_width="250dp"
         android:layout_height="40dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/buttonlogin"
         android:text="Salva"
         android:textColor="#428238"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/cancellaIngrediente"
-        app:layout_constraintTop_toBottomOf="@+id/listIngredientiScelti" />
-
-    <ImageView
-        android:id="@+id/cancellaIngrediente"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/baseline_clear_24"
-        android:text="Cancella"
-        android:textColor="#b21601"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/salva"
-        app:layout_constraintEnd_toStartOf="@+id/indietro"
         app:layout_constraintTop_toBottomOf="@+id/listIngredientiScelti" />
 
     <ImageView
@@ -90,14 +58,9 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/baseline_undo_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cancellaIngrediente"
-        app:layout_constraintTop_toBottomOf="@+id/listIngredientiScelti" />
+        android:background="@drawable/baseline_arrow_back_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

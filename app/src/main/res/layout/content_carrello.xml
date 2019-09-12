@@ -46,8 +46,8 @@
 
     <Button
         android:id="@+id/prenota"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
+        android:layout_width="250dp"
+        android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="8dp"
@@ -55,37 +55,20 @@
         android:text="Prenota"
         android:textColor="#ffff"
         app:layout_constraintBottom_toBottomOf="@+id/imageView"
-        app:layout_constraintEnd_toStartOf="@+id/cancellaProdotto"
+        app:layout_constraintEnd_toStartOf="@+id/svuotaCarrello"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/listProdotti" />
 
     <ImageView
-        android:id="@+id/cancellaProdotto"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/baseline_clear_24"
-        android:text="Cancella"
-        android:textColor="#ffff"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/svuotaCarrello"
-        app:layout_constraintStart_toEndOf="@+id/prenota"
-        app:layout_constraintTop_toBottomOf="@+id/listProdotti" />
-
-    <ImageView
         android:id="@+id/svuotaCarrello"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginTop="15dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/baseline_delete_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cancellaProdotto"
         app:layout_constraintTop_toBottomOf="@+id/listProdotti" />
 
 

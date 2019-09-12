@@ -27,6 +27,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,6 +63,7 @@ public class activity_info_ordine extends AppCompatActivity
     TextView OrderId;
     TextView CostoTotale;
     Switch Domicilio;
+    ImageView deleteOrder;
 
     int posSelected = -1;
 
@@ -118,9 +120,11 @@ public class activity_info_ordine extends AppCompatActivity
         Domicilio = findViewById(R.id.swDomicilio);
         OrderId = findViewById(R.id.OrderId);
         CostoTotale = findViewById(R.id.CostoTotale);
+        deleteOrder = findViewById(R.id.deleteOrder);
 
         //ListView Declaration
         listProducts = (ListView) findViewById(R.id.listProducts);
+
 
         //Get INTENT Extra
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
@@ -187,7 +191,23 @@ public class activity_info_ordine extends AppCompatActivity
 
             }
         });
+        deleteOrder.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+                System.out.println("Delete Order");
 
+                String par = "idOrdine="+O.getId();
+                InsertIntoDB(Connection.getURL(WebConnection.query.DELETEORDER, par));
+                Toast.makeText(getApplicationContext(), "Ordine cancellato", Toast.LENGTH_SHORT).show();
+
+                Intent I = new Intent(activity_info_ordine.this, activity_gestione_ordini.class);
+                I.putExtra("Cart", cartProducts);
+                I.putExtra("User", UserLogged);
+                I.putExtra("WebConnection" ,Connection);
+                startActivity(I);
+                activity_info_ordine.this.finish();
+            }
+        });
         spChangeStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -309,7 +329,7 @@ public class activity_info_ordine extends AppCompatActivity
         pd.setCancelable(false);
         pd.show();
     }
-    private void InsertIntoDB(final String urlWebService) {
+    public void InsertIntoDB(final String urlWebService) {
 
         try {
 
@@ -349,6 +369,9 @@ public class activity_info_ordine extends AppCompatActivity
             return null;
         }
     }
+
+    public Order getOrder(){return O;}
+    public WebConnection getConnection(){return Connection;}
 
     private void fillOrder(String json) {
 
@@ -390,6 +413,7 @@ public class activity_info_ordine extends AppCompatActivity
                 P.setImageURL(product.getString("ImageURL"));
                 P.setTipo(product.getString("Type"));
                 P.setNome(product.getString("Name"));
+                P.setQuantity(product.getInt("Quantity"));
 
                 JSONArray ingredients = product.getJSONArray("Ingredients");
                 List<Ingredient> listIngredient = new ArrayList<>();
@@ -435,7 +459,7 @@ public class activity_info_ordine extends AppCompatActivity
     private void loadIntoProductListView(List<Product> listP)
     {
         List<HashMap<String, String>> listitems = new ArrayList<>();
-        SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
+        customAdapter_info_ordine adapter = new customAdapter_info_ordine(this, listitems, R.layout.list_item__with_2_icon, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2}, listP);
 
         List<Ingredient> listI;
         for(int k=0; k<listP.size(); k++)

@@ -23,7 +23,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -101,7 +100,6 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         //Image and Button Declaration
         ImageView btnClearCart = findViewById(R.id.svuotaCarrello);
         Button btnOrder = findViewById(R.id.prenota);
-        ImageView btnRemoveProduct = findViewById(R.id.cancellaProdotto);
         ImageView imgProduct = findViewById(R.id.imgProduct);
 
 
@@ -118,12 +116,10 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         //Setting Visibility of Button
         if(cartProducts.getListProducts().size() > 0) {
             loadIntoListView(cartProducts.getListProducts());
-            btnRemoveProduct.setVisibility(View.INVISIBLE);
         }
         else{
             btnClearCart.setVisibility(View.INVISIBLE);
             btnOrder.setVisibility(View.INVISIBLE);
-            btnRemoveProduct.setVisibility(View.INVISIBLE);
         }
 
 
@@ -132,6 +128,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 view.setSelected(true);
+                //Toast.makeText(getApplicationContext(), "1", Toast.LENGTH_SHORT).show();
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -148,11 +146,11 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                             @Override
                             public void run() {
                                 // Stuff that updates the UI
-                                btnRemoveProduct.setVisibility(View.VISIBLE);
+                                //btnRemoveProduct.setVisibility(View.VISIBLE);
                             }
                         });
 
-                        if (cartProducts.getListProducts().get(position).getImageURL().equals("null"))
+                        if (cartProducts.getListProducts().get(position).getImageURL().equals("nd"))
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -204,7 +202,6 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
 
                                     @Override
                                     public void onAnimationEnd(Animation animation) {
-                                        btnRemoveProduct.setVisibility(View.INVISIBLE);
                                         btnClearCart.setVisibility(View.INVISIBLE);
                                         btnOrder.setVisibility(View.INVISIBLE);
                                     }
@@ -223,61 +220,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             }
         });
 
-        btnRemoveProduct.setOnClickListener(new View.OnClickListener() {
-            //@Override
-            public void onClick(View v) {
 
-                //Product P = cartProducts.getListProducts().get(posSelected);
-                //Toast.makeText(getApplicationContext(), P.getNome() + " " + P.getId(), Toast.LENGTH_SHORT).show();
-                if (posSelected != -1) {
-                    if (cartProducts.size() > 0) {
-                        new Thread(new Runnable() {
-                            public void run() {
-                                cartProducts.remove(cartProducts.getListProducts().get(posSelected));
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Stuff that updates the UI
-                                        loadIntoListView(cartProducts.getListProducts());
-
-                                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                                        animation1.setDuration(1000);
-                                        v.startAnimation(animation1);
-                                        animation1.setAnimationListener(new Animation.AnimationListener() {
-                                            @Override
-                                            public void onAnimationStart(Animation animation) {
-
-                                            }
-
-                                            @Override
-                                            public void onAnimationEnd(Animation animation) {
-                                                btnRemoveProduct.setVisibility(View.INVISIBLE);
-                                                if(cartProducts.size() == 0)
-                                                {
-                                                    btnClearCart.setVisibility(View.INVISIBLE);
-                                                    btnOrder.setVisibility(View.INVISIBLE);
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onAnimationRepeat(Animation animation) {
-
-                                            }
-                                        });
-                                    }
-                                });
-                                posSelected = -1;
-
-                            }
-                        }).start();
-
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Non sono presenti prodotti", Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        });
 
         btnOrder.setOnClickListener(new View.OnClickListener() {
             //@Override
@@ -370,7 +313,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
             String dateStr = date.format(O.getDateTime());
             String timeStr = time.format(O.getDateTime());
-            String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr;
+            String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() + "&Costo=" + O.getTotaleCosto() +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr;
 
             new Thread(new Runnable() {
                 public void run() {
@@ -410,7 +353,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             System.out.println(O.getListProducts().get(k).getNome());
             if (O.getListProducts().get(k).getNome().equals("Personalizzata")) {
 
-                par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&idLocale=1&ImageURL=null";
+                par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&Tipo=" + O.getListProducts().get(k).getTipo() +"&idLocale=1&ImageURL="+ O.getListProducts().get(k).getImageURL() ;
                 idProductEdited = InsertIntoDBWithId(Connection.getURL(WebConnection.query.INSERTPRODUCT, par));
 
                 //par = "idProdotto=" + String.valueOf(idProductEdited) + "&Tipo=" + O.getListProducts().get(k).getTipo();
@@ -424,11 +367,11 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                 }
                 System.out.println(String.valueOf(idProductEdited));
 
-                par = "idOrdine=" + idOrderInserted + "&idProdotto=" + idProductEdited;
+                par = "idOrdine=" + idOrderInserted + "&idProdotto=" + idProductEdited + "&Quantita=" + O.getListProducts().get(k).getQuantity();
                 InsertIntoDB(Connection.getURL(WebConnection.query.INSERTORDERPRODUCT, par)); // InsertOrderProduct
             }
             else{
-                par = "idOrdine=" + idOrderInserted + "&idProdotto=" + O.getListProducts().get(k).getId() + "&Quantita=1";
+                par = "idOrdine=" + idOrderInserted + "&idProdotto=" + O.getListProducts().get(k).getId() + "&Quantita=" + O.getListProducts().get(k).getQuantity();
                 InsertIntoDB(Connection.getURL(WebConnection.query.INSERTORDERPRODUCT, par)); // InsertOrderProduct
             }
 
@@ -526,7 +469,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
     private void loadIntoListView(List<Product> listP)
     {
         List<HashMap<String, String>> listitems = new ArrayList<>();
-        SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
+        //SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
+        customAdapter_carrello adapter = new customAdapter_carrello(this, listitems, R.layout.list_item__with_2_icon, new String[]{"First Line", "Icon", "Second Line"}, new int[]{R.id.text1, R.id.icon, R.id.text2});
 
 
 
@@ -548,6 +492,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                 }
             }
             Ingredienti += " €" + listP.get(k).getPrezzo();
+            System.out.println(Ingredienti);
             resultMap.put("Second Line", Ingredienti);
             listitems.add(resultMap);
         }
@@ -604,6 +549,15 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         else if (id == R.id.nav_ordini)
         {
             Intent I = new Intent(activity_carrello.this, activity_ordini.class);
+            I.putExtra("Cart", cartProducts);
+            I.putExtra("User", UserLogged);
+            I.putExtra("WebConnection" ,Connection);
+            startActivity(I);
+            activity_carrello.this.finish();
+        }
+        else if (id == R.id.nav_gestione_ordini)
+        {
+            Intent I = new Intent(activity_carrello.this, activity_gestione_ordini.class);
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);

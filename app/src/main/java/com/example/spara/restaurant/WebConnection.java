@@ -10,7 +10,7 @@ public class WebConnection extends Thread implements Parcelable  {
     public enum query {
         LISTACCOUNTS, INGREDIENTS, ORDERPRODUCTSUSER, BURGERFRIESINGREDIENTS, PIZZEINGREDIENTS, PRODUCTSINGREDIENTS, SALADSINGREDIENTS, INSERTUSER, INSERTORDER, INSERTORDERPRODUCT, INSERTPRODUCT,
         INSERTPRODUCTTIPOLOGY, INSERTPRODUCTINGREDIENT, UPDATEORDER, NOTICE, NOTICESTATEUPDATE, PRODUCTIMAGE, SEARCHACCOUNT, ORDERPRODUCTSUSERSTATE,
-        ORDER, ADMINLIST, INSERTLOCALUSER, INSERTNOTICE, SEARCHACCOUNTBYID
+        ORDER, ADMINLIST, INSERTLOCALUSER, INSERTNOTICE, SEARCHACCOUNTBYID, UPDATEORDERPRODUCT, DELETEORDERPRODUCT, DELETEORDER
     }
 
     public  WebConnection(){ }
@@ -50,7 +50,7 @@ public class WebConnection extends Thread implements Parcelable  {
             case INSERTORDERPRODUCT:
                 return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/SaveOrderProduct?" + parameters;
             case INSERTPRODUCT:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/SaveProducy?" + parameters;
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/SaveProduct?" + parameters;
             case INSERTPRODUCTTIPOLOGY:
                 return "http://" + ipWebServer + "/API/InserisciProdottoTipologia.php?" + parameters; //NON UTILIZZATA
             case INSERTPRODUCTINGREDIENT:
@@ -70,8 +70,13 @@ public class WebConnection extends Thread implements Parcelable  {
             case ADMINLIST:
                 return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllUsersByAdmin?" + parameters;
             case INSERTNOTICE:
-                return "http://" + ipWebServer + "/API/InserisciAvviso.php?" + parameters;
-
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/SaveNotice?" + parameters;
+            case UPDATEORDERPRODUCT:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/UpdateOrderProduct?" + parameters;
+            case DELETEORDERPRODUCT:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/DeleteOrderProduct?" + parameters;
+            case DELETEORDER:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/DeleteOrder?" + parameters;
 
             default:
                 return "";

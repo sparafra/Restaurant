@@ -5,19 +5,27 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -42,6 +50,10 @@ import org.json.JSONObject;
 
 public class activity_home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    //PERMISSION CODE
+    //CALL - 1
+    //INTERNET -2
 
     ListView list;
 
@@ -75,6 +87,33 @@ public class activity_home extends AppCompatActivity
             }
         });
         */
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.INTERNET)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET},
+                        2);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_home);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -151,7 +190,7 @@ public class activity_home extends AppCompatActivity
                 else {
                     if (pizzeSelected) {
                         System.out.println(listProducts.get(position - 1).getImageURL());
-                        if (listProducts.get(position - 1).getImageURL().equals("null"))
+                        if (listProducts.get(position - 1).getImageURL().equals("nd"))
                         {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -335,11 +374,30 @@ public class activity_home extends AppCompatActivity
                 if(posSelected != -1) {
                     if(pizzeSelected)
                     {
-                        cartProducts.addProduct(listProducts.get(posSelected-1));
+                        boolean trovato = false;
+                        for(int k=0; k<cartProducts.getListProducts().size() && !trovato; k++)
+                        {
+                            if(cartProducts.getListProducts().get(k).getId() == listProducts.get(posSelected-1).getId()) {
+                                cartProducts.getListProducts().get(k).setQuantity(cartProducts.getListProducts().get(k).getQuantity()+1);
+                                trovato = true;
+                            }
+                        }
+                        if(!trovato)
+                            cartProducts.addProduct(listProducts.get(posSelected - 1));
+
                         Toast.makeText(getApplicationContext(), listProducts.get(posSelected-1).getNome() + " aggiunto al carrello", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        cartProducts.addProduct(listProducts.get(posSelected));
+                        boolean trovato = false;
+                        for(int k=0; k<cartProducts.getListProducts().size() && !trovato; k++)
+                        {
+                            if(cartProducts.getListProducts().get(k).getId() == listProducts.get(posSelected).getId()) {
+                                cartProducts.getListProducts().get(k).setQuantity(cartProducts.getListProducts().get(k).getQuantity()+1);
+                                trovato = true;
+                            }
+                        }
+                        if(!trovato)
+                            cartProducts.addProduct(listProducts.get(posSelected));
                         Toast.makeText(getApplicationContext(), listProducts.get(posSelected).getNome() + " aggiunto al carrello", Toast.LENGTH_SHORT).show();
                     }
                     posSelected = -1;
@@ -422,33 +480,43 @@ public class activity_home extends AppCompatActivity
             JSONArray jsonArray = new JSONArray(json);
             String[][] stocks = new String[jsonArray.length()][2];
             StringBuilder Ingredienti;
-            int nProdotti = 0;
+            //int nProdotti = 0;
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 boolean presente = false;
                 JSONObject obj = jsonArray.getJSONObject(i);
                 Product P = new Product();
                 Ingredienti = new StringBuilder();
+                /*
                 for (int k = 0; k < stocks.length && !presente; k++) {
                     if (obj.getString("Name").equals(stocks[k][0])) {
                         presente = true;
                     }
                 }
+
+                 */
                 if (!presente) {
                     P.setId(Integer.parseInt(obj.getString("id")));
                     P.setPrezzo(Float.parseFloat(obj.getString("Price")));
                     P.setTipo(obj.getString("Type"));
                     P.setNome(obj.getString("Name"));
                     P.setImageURL(obj.getString("ImageURL"));
-                    stocks[nProdotti][0] = obj.getString("Name");
+                    P.setQuantity(obj.getInt("Quantity"));
+                    P.setIdLocale(obj.getLong("idLocal"));
+
+                    //stocks[nProdotti][0] = obj.getString("Name");
                     String prezzo = obj.getString("Price");
 
                     int nIngredienti = 0;
                     List<Ingredient> listIngredients = new ArrayList<>();
-                    for (int k = 0; k < jsonArray.length(); k++) {
-                        JSONObject tmpobj = jsonArray.getJSONObject(k);
+                    List<ReviewProduct> listReview = new ArrayList<>();
+
+                    JSONArray jsonArrayIngredientsOfProduct = obj.getJSONArray("Ingredients");
+
+                    for (int k = 0; k < jsonArrayIngredientsOfProduct.length(); k++) {
+                        JSONObject tmpobj = jsonArrayIngredientsOfProduct.getJSONObject(k);
                         Ingredient I = new Ingredient();
-                        if (tmpobj.getString("Name").equals(stocks[nProdotti][0])) {
+                        //if (tmpobj.getString("Name").equals(stocks[nProdotti][0])) {
                             if (nIngredienti == 0) {
                                 Ingredienti.append(tmpobj.getString("Name"));
                             } else {
@@ -459,7 +527,22 @@ public class activity_home extends AppCompatActivity
                             I.setPrezzo(Float.parseFloat(tmpobj.getString("Price")));
                             listIngredients.add(I);
                             nIngredienti++;
-                        }
+                        //}
+                    }
+                    JSONArray jsonArrayReviewOfProduct = obj.getJSONArray("Reviews");
+
+                    for (int k = 0; k < jsonArrayReviewOfProduct.length(); k++) {
+                        JSONObject tmpobj = jsonArrayReviewOfProduct.getJSONObject(k);
+                        ReviewProduct RP = new ReviewProduct();
+
+                        RP.setVoto(Integer.parseInt(tmpobj.getString("Voto")));
+                        RP.setNumeroTelefono(tmpobj.getString("NumeroTelefono"));
+                        Date date1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(tmpobj.getString("DataOra"));
+                        RP.setDataOra(date1);
+                        RP.setIdProduct(tmpobj.getLong("idProdotto"));
+                        listReview.add(RP);
+                        nIngredienti++;
+                        //}
                     }
                     if (nIngredienti == 1 && Ingredienti.toString().equals("null")) {
                         Ingredienti.delete(0, Ingredienti.length());
@@ -467,9 +550,10 @@ public class activity_home extends AppCompatActivity
                     } else {
                         Ingredienti.append(" €" + prezzo);
                     }
-                    stocks[nProdotti][1] = Ingredienti.toString().trim();
-                    nProdotti++;
+                    //stocks[nProdotti][1] = Ingredienti.toString().trim();
+                    //nProdotti++;
                     P.setListIngredienti(listIngredients);
+                    P.setListReview(listReview);
                     listProducts.add(P);
                 }
             }
@@ -563,6 +647,34 @@ public class activity_home extends AppCompatActivity
         }
         else if (id == R.id.nav_chiamaci)
         {
+            // Here, thisActivity is the current activity
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.CALL_PHONE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Permission is not granted
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.CALL_PHONE)) {
+                    // Show an explanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+                } else {
+                    // No explanation needed; request the permission
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.CALL_PHONE},
+                            1);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                }
+            } else {
+                // Permission has already been granted
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:123456789"));
+                startActivity(callIntent);
+            }
 
         }
         else if (id == R.id.nav_exit)
@@ -575,6 +687,45 @@ public class activity_home extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_home);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    callIntent.setData(Uri.parse("tel:123456789"));
+                    startActivity(callIntent);
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            case 2: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    savePreferences("", "", "");
+                    startActivity(new Intent(activity_home.this, MainActivity.class));
+                    activity_home.this.finish();
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
     }
     private void savePreferences(String NumeroTelefono, String Mail, String Password) {
         SharedPreferences settings = getSharedPreferences("alPachino",

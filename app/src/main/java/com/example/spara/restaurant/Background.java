@@ -116,26 +116,10 @@ public class Background extends Service {
             UserLogged.setNome(obj.getString("Nome"));
             UserLogged.setCognome(obj.getString("Cognome"));
             UserLogged.setIndirizzo(obj.getString("Indirizzo"));
-            if(obj.getBoolean("Amministratore") == false)
-            {
-                UserLogged.setAmministratore(false);
-
-            }
-            else
-            {
-                UserLogged.setAmministratore(true);
-
-            }
-            if(obj.getBoolean("Confermato") == false)
-            {
-                UserLogged.setConfermato(false);
-
-            }
-            else
-            {
-                UserLogged.setConfermato(true);
-            }
-
+            UserLogged.setAmministratore(obj.getBoolean("Amministratore"));
+            UserLogged.setConfermato(obj.getBoolean("Confermato"));
+            UserLogged.setIdLocale(obj.getLong("idLocale"));
+            UserLogged.setDisabilitato(obj.getBoolean("Disabilitato"));
 
         }catch (Exception e){e.printStackTrace();}
     }
@@ -211,12 +195,19 @@ public class Background extends Service {
 
         //System.out.println(Message.substring(Message.indexOf(": ")+2));
         //System.out.println(Integer.parseInt(Message.substring(Message.indexOf(": ")+2)));
-        Intent notificationIntent = new Intent(this, activity_info_ordine.class);
-        notificationIntent.putExtra("Cart", cartProducts);
-        notificationIntent.putExtra("User", UserLogged);
-        notificationIntent.putExtra("WebConnection" ,Connection);
-        notificationIntent.putExtra("idOrdine", Integer.parseInt(Message.substring(Message.indexOf(": ")+2)));
-
+        Intent notificationIntent;
+        try {
+            notificationIntent = new Intent(this, activity_info_ordine.class);
+            notificationIntent.putExtra("Cart", cartProducts);
+            notificationIntent.putExtra("User", UserLogged);
+            notificationIntent.putExtra("WebConnection", Connection);
+            notificationIntent.putExtra("idOrdine", Integer.parseInt(Message.substring(Message.indexOf(": ") + 2)));
+        }catch (Exception e){
+            notificationIntent = new Intent(this, activity_home.class);
+            notificationIntent.putExtra("Cart", cartProducts);
+            notificationIntent.putExtra("User", UserLogged);
+            notificationIntent.putExtra("WebConnection", Connection);
+        }
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 

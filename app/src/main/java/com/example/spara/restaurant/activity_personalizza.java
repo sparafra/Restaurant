@@ -91,8 +91,8 @@ public class activity_personalizza extends AppCompatActivity
         listviewChoosedIngredients = findViewById(R.id.listIngredientiScelti);
 
         //Button Declaration
-        addIngredient = findViewById(R.id.addIgredient);
-        deleteIngredient = findViewById(R.id.cancellaIngrediente);
+        //addIngredient = findViewById(R.id.addIgredient);
+        //deleteIngredient = findViewById(R.id.cancellaIngrediente);
         back = findViewById(R.id.indietro);
         save = findViewById(R.id.salva);
 
@@ -142,8 +142,8 @@ public class activity_personalizza extends AppCompatActivity
                     @Override
                     public void run() {
                         // Stuff that updates the UI
-                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                        animation1.setDuration(1000);
+                        Animation animation1 = new AlphaAnimation(0.0f, 1.0f);
+                        animation1.setDuration(500);
                         view.startAnimation(animation1);
                     }
                 });
@@ -159,11 +159,11 @@ public class activity_personalizza extends AppCompatActivity
                     @Override
                     public void run() {
                         // Stuff that updates the UI
-                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                        animation1.setDuration(1000);
-                        deleteIngredient.setVisibility(View.VISIBLE);
-                        view.startAnimation(animation1);
-                        deleteIngredient.startAnimation(animation1);
+                        //Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                        //animation1.setDuration(1000);
+                        //deleteIngredient.setVisibility(View.VISIBLE);
+                        //view.startAnimation(animation1);
+                        //deleteIngredient.startAnimation(animation1);
 
                     }
                 });
@@ -171,7 +171,7 @@ public class activity_personalizza extends AppCompatActivity
                 posSelected = -1;
             }
         });
-
+        /*
         addIngredient.setOnClickListener(new View.OnClickListener() {
             //@Override
             public void onClick(View v) {
@@ -228,7 +228,40 @@ public class activity_personalizza extends AppCompatActivity
                 }
             }
         });
+        deleteIngredient.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+
+                if(posSelectedChoosed != -1) {
+                    new Thread(new Runnable() {
+                        public void run() {
+                            listIngredients.add(listChoosedIngredients.get(posSelectedChoosed));
+                            listChoosedIngredients.remove(posSelectedChoosed);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Stuff that updates the UI
+                                    loadIntoIngredientListView();
+                                    loadIntoChoosedIngredientListView();
+
+                                    Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                                    animation1.setDuration(1000);
+
+                                    v.startAnimation(animation1);
+                                }
+                            });
+                            posSelectedChoosed = -1;
+                        }
+                    }).start();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Seleziona un Ingrediente", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        */
         save.setOnClickListener(new View.OnClickListener() {
+
             //@Override
             public void onClick(View v) {
 
@@ -240,10 +273,12 @@ public class activity_personalizza extends AppCompatActivity
                     {
                         prezzo += listChoosedIngredients.get(k).getPrezzo();
                     }
-                    P.setImageURL("null");
+                    P.setImageURL("nd");
                     P.setPrezzo(prezzo);
                     P.setTipo("Pizza");
                     P.setListIngredienti(listChoosedIngredients);
+                    P.setIdLocale(UserLogged.getIdLocale());
+                    P.setQuantity(1);
                     cartProducts.addProduct(P);
 
                     runOnUiThread(new Runnable() {
@@ -287,37 +322,7 @@ public class activity_personalizza extends AppCompatActivity
 
             }
         });
-        deleteIngredient.setOnClickListener(new View.OnClickListener() {
-            //@Override
-            public void onClick(View v) {
 
-                if(posSelectedChoosed != -1) {
-                    new Thread(new Runnable() {
-                        public void run() {
-                            listIngredients.add(listChoosedIngredients.get(posSelectedChoosed));
-                            listChoosedIngredients.remove(posSelectedChoosed);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // Stuff that updates the UI
-                                    loadIntoIngredientListView();
-                                    loadIntoChoosedIngredientListView();
-
-                                    Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                                    animation1.setDuration(1000);
-
-                                    v.startAnimation(animation1);
-                                }
-                            });
-                            posSelectedChoosed = -1;
-                        }
-                    }).start();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(), "Seleziona un Ingrediente", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
     private String downloadJSON(final String urlWebService) {
 
@@ -354,34 +359,34 @@ public class activity_personalizza extends AppCompatActivity
         }catch (Exception e){e.printStackTrace();}
     }
 
-    private void loadIntoIngredientListView()
+    public void loadIntoIngredientListView()
     {
         List<HashMap<String, String>> listitems = new ArrayList<>();
-        SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
+        customAdapter_personalizza adapter = new customAdapter_personalizza(this, listitems, R.layout.list_item_icon, new String[]{"First Line", "Icon1", "Second Line"}, new int[]{R.id.text1, R.id.icon1, R.id.text2}, listIngredients, listChoosedIngredients);
 
 
         for(int k=0; k<listIngredients.size(); k++)
         {
             HashMap<String, String> resultMap = new HashMap<>();
             resultMap.put("First Line", listIngredients.get(k).getNome() + " €" + String.valueOf(listIngredients.get(k).getPrezzo()));
-
+            resultMap.put("Icon1", "add");
             resultMap.put("Second Line", "");
             listitems.add(resultMap);
         }
         listviewIngredients.setAdapter(adapter);
     }
 
-    private void loadIntoChoosedIngredientListView()
+    public void loadIntoChoosedIngredientListView()
     {
         List<HashMap<String, String>> listitems = new ArrayList<>();
-        SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
+        customAdapter_personalizza adapter = new customAdapter_personalizza(this, listitems, R.layout.list_item_icon, new String[]{"First Line", "Icon1", "Second Line"}, new int[]{R.id.text1, R.id.icon1, R.id.text2}, listIngredients, listChoosedIngredients);
 
 
         for(int k=0; k<listChoosedIngredients.size(); k++)
         {
             HashMap<String, String> resultMap = new HashMap<>();
             resultMap.put("First Line", listChoosedIngredients.get(k).getNome() + " €" + String.valueOf(listChoosedIngredients.get(k).getPrezzo()));
-
+            resultMap.put("Icon1", "remove");
             resultMap.put("Second Line", "");
             listitems.add(resultMap);
         }

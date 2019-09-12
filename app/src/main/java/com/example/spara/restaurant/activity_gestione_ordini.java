@@ -293,6 +293,7 @@ public class activity_gestione_ordini extends AppCompatActivity
                     P.setImageURL(product.getString("ImageURL"));
                     P.setTipo(product.getString("Type"));
                     P.setNome(product.getString("Name"));
+                    P.setQuantity(product.getInt("Quantity"));
 
                     JSONArray ingredients = product.getJSONArray("Ingredients");
                     List<Ingredient> listIngredient = new ArrayList<>();
