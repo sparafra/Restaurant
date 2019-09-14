@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -120,15 +121,15 @@ public class activity_signin extends AppCompatActivity
             public void onClick(View v) {
                 // Code here executes on main thread after user presses button
 
-                String mail = Mail.getText().toString();
-                String password = Password.getText().toString();
-                String confermaPassword = ConfermaPassword.getText().toString();
-                String nome = Nome.getText().toString();
-                String cognome = Cognome.getText().toString();
-                String indirizzo = Indirizzo.getText().toString();
-                String citta = Citta.getText().toString();
-                String cap = Cap.getText().toString();
-                String numeroTelefono = NumeroTelefono.getText().toString();
+                String mail = Mail.getText().toString().trim().replaceAll(" ", "%20");
+                String password = Password.getText().toString().trim().replaceAll(" ", "%20");
+                String confermaPassword = ConfermaPassword.getText().toString().trim().replaceAll(" ", "%20");
+                String nome = Nome.getText().toString().trim().replaceAll(" ", "%20");
+                String cognome = Cognome.getText().toString().trim().replaceAll(" ", "%20");
+                String indirizzo = Indirizzo.getText().toString().trim().replaceAll(" ", "%20");
+                String citta = Citta.getText().toString().trim().replaceAll(" ", "%20");
+                String cap = Cap.getText().toString().trim().replaceAll(" ", "%20");
+                String numeroTelefono = NumeroTelefono.getText().toString().trim();
 
                 /*
                 System.out.println(mail);
@@ -157,20 +158,28 @@ public class activity_signin extends AppCompatActivity
                             try {
                                 Connection = new WebConnection();
 
-                                String IndirizzoCompleto = Indirizzo + ", " + cap + ", " + citta;
-
+                                String IndirizzoCompleto = indirizzo + ", " + cap + ", " + citta;
+                                IndirizzoCompleto = IndirizzoCompleto.replaceAll(" ", "%20");
+                                System.out.println(IndirizzoCompleto);
                                 User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, (long)1, false);
 
-                                String par = "NumeroTelefono=" + U.getNumeroTelefono() + "&Mail=null";
-                                String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
-                                JSONArray jsonArray = new JSONArray(tmpJSON);
+                                String par = "NumeroTelefono=" + U.getNumeroTelefono();
+                                String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
+                                JSONObject obj = new JSONObject(tmpJSON);
+                                System.out.println(obj);
 
-                                if(jsonArray.length() == 0) {
+                                if(obj.length() == 0) {
 
-                                    String Via = U.getIndirizzo().replaceAll(" ", "%20");
-                                    System.out.println(Via);
-                                    par = "NumeroTelefono=" + U.getNumeroTelefono() + "&Nome=" + U.getNome() + "&Cognome=" + U.getCognome() + "&Mail=" + U.getMail() + "&Indirizzo=" + Via + "&Password=" + U.getPassword() + "&Confermato=" + U.getConfermato() + "&Amministratore=" + U.getAmministratore() +"&idLocale=" + U.getIdLocale() + "&Disabilitato=" + U.getDisabilitato();
-                                    showLoadingDialog();
+                                    //String Via = U.getIndirizzo().replaceAll(" ", "%20");
+                                    //System.out.println(Via);
+                                    par = "NumeroTelefono=" + U.getNumeroTelefono() + "&Nome=" + U.getNome() + "&Cognome=" + U.getCognome() + "&Mail=" + U.getMail() + "&Indirizzo=" + U.getIndirizzo() + "&Password=" + U.getPassword() + "&Confermato=" + U.getConfermato() + "&Amministratore=" + U.getAmministratore() +"&idLocale=" + U.getIdLocale() + "&Disabilitato=" + U.getDisabilitato();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Stuff that updates the UI
+                                            showLoadingDialog();                                        }
+                                    });
+
                                     InsertIntoDB(Connection.getURL(WebConnection.query.INSERTUSER, par));
 
                                     //par="idLocale=1&NumeroTelefono=" + U.getNumeroTelefono();

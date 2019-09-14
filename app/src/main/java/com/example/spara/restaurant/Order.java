@@ -78,11 +78,17 @@ public class Order {
             {
                 Tot += listProducts.get(k).getPrezzo()*listProducts.get(k).getQuantity();
             }
-            return  Tot;
+            if(Asporto)
+                return  Tot+1;
+            else
+                return Tot;
         }
-        else
-            return Costo;
-
+        else {
+            if(Asporto)
+                return  Costo+1;
+            else
+                return Costo;
+        }
 
     }
 }
