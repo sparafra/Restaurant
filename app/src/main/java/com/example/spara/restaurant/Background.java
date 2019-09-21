@@ -275,7 +275,7 @@ public class Background extends Service {
             Notice N = new Notice();
             N.setIdAvviso(obj.getInt("idAvviso"));
             N.setCreatoDa(obj.getString("CreatoDa"));
-            N.setIdLocale(obj.getInt("idLocale"));
+            N.setIdLocale(obj.getLong("idLocale"));
             N.setMessaggio(obj.getString("Messaggio"));
             N.setRicevutoDa(obj.getString("RicevutoDa"));
             if(obj.getBoolean("Stato") == false)

@@ -252,7 +252,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                                 InsertOrderProduct(O);
 
 
-                                String par = "idLocale=1&Amministratore=true";
+                                String par = "idLocale=" + Restaurant.id + "&Amministratore=true";
                                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ADMINLIST, par));
                                 List<User> AdminUsers = fillUsers(tmpJSON);
 
@@ -262,10 +262,10 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                                     N.setStato(false);
                                     N.setRicevutoDa(AdminUsers.get(k).getNumeroTelefono());
                                     N.setMessaggio("Ricevuto nuovo ordine con id: " + O.getId());
-                                    N.setIdLocale(1);
+                                    N.setIdLocale(Restaurant.id);
                                     N.setCreatoDa(O.getNumeroTelefono());
 
-                                    par = "Stato=" + N.getStato() + "&CreatoDa=" + N.getCreatoDa() + "&Messaggio=" + N.getMessaggio().replaceAll(" ", "%20") + "&idLocale=1&RicevutoDa=" + N.getRicevutoDa();
+                                    par = "Stato=" + N.getStato() + "&CreatoDa=" + N.getCreatoDa() + "&Messaggio=" + N.getMessaggio().replaceAll(" ", "%20") + "&idLocale=" + N.getIdLocale() +"&RicevutoDa=" + N.getRicevutoDa();
                                     InsertIntoDB(Connection.getURL(WebConnection.query.INSERTNOTICE, par));
 
                                 }
@@ -343,7 +343,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         String dateStr = date.format(O.getDateTime());
         String timeStr = time.format(O.getDateTime());
         System.out.println(O.getTotaleCosto());
-        String par = "Asporto=" + O.getAsporto() + "&Pagato=false" +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale=1&Costo=" + O.getTotaleCosto() ;
+        String par = "Asporto=" + O.getAsporto() + "&Pagato=false" +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale=" + UserLogged.getIdLocale() + "&Costo=" + O.getTotaleCosto() ;
 
         try {
             idOrderInserted = InsertIntoDBWithId(Connection.getURL(WebConnection.query.INSERTORDER, par));
@@ -358,7 +358,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             System.out.println(O.getListProducts().get(k).getNome());
             if (O.getListProducts().get(k).getNome().equals("Personalizzata")) {
 
-                par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&Tipo=" + O.getListProducts().get(k).getTipo() +"&idLocale=1&ImageURL="+ O.getListProducts().get(k).getImageURL() ;
+                par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&Tipo=" + O.getListProducts().get(k).getTipo() +"&idLocale=" + Restaurant.id + "&ImageURL="+ O.getListProducts().get(k).getImageURL() ;
                 idProductEdited = InsertIntoDBWithId(Connection.getURL(WebConnection.query.INSERTPRODUCT, par));
 
                 //par = "idProdotto=" + String.valueOf(idProductEdited) + "&Tipo=" + O.getListProducts().get(k).getTipo();
@@ -417,7 +417,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                 U.setIndirizzo(obj.getString("Indirizzo"));
                 U.setAmministratore(obj.getBoolean("Amministratore"));
                 U.setConfermato(obj.getBoolean("Confermato"));
-
+                U.setIdLocale(obj.getLong("idLocale"));
 
                 list.add(U);
             }
@@ -639,7 +639,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:123456789"));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the

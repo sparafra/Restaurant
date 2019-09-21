@@ -7,7 +7,7 @@ public class Notice {
     String CreatoDa;
     String RicevutoDa;
     String Messaggio;
-    int idLocale;
+    Long idLocale;
 
     public Notice(){}
 
@@ -41,10 +41,10 @@ public class Notice {
     public void setMessaggio(String messaggio) {
         Messaggio = messaggio;
     }
-    public int getIdLocale() {
+    public Long getIdLocale() {
         return idLocale;
     }
-    public void setIdLocale(int idLocale) {
+    public void setIdLocale(Long idLocale) {
         this.idLocale = idLocale;
     }
 }

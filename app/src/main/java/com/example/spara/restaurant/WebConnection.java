@@ -86,17 +86,17 @@ public class WebConnection extends Thread implements Parcelable  {
     {
         switch(Q) {
             case LISTACCOUNTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllUsers";
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllUsers?idLocale=" + Restaurant.id;
             case INGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllIngredients";
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllIngredients?idLocale=" + Restaurant.id;
             case BURGERFRIESINGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Fritti";
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Fritti&idLocale=" + Restaurant.id;
             case PIZZEINGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Pizza";
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Pizza&idLocale=" + Restaurant.id;
             case PRODUCTSINGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllProducts";
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllProducts?idLocale=" + Restaurant.id;
             case SALADSINGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Panino";
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Panino&idLocale=" + Restaurant.id;
             default:
                 return "";
         }

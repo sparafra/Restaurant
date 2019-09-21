@@ -112,7 +112,7 @@ public class activity_ordini extends AppCompatActivity
         }
         //Toast.makeText(getApplicationContext(), UserLogged.getNumeroTelefono(), Toast.LENGTH_SHORT).show();
 
-        String par = "NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale=1";
+        String par = "NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale="+UserLogged.getIdLocale();
         showLoadingDialog();
         new Thread(new Runnable() {
             public void run() {
@@ -440,7 +440,7 @@ public class activity_ordini extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:123456789"));
+                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                 startActivity(callIntent);
             }
         }
@@ -466,7 +466,7 @@ public class activity_ordini extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:123456789"));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the

@@ -161,7 +161,7 @@ public class activity_signin extends AppCompatActivity
                                 String IndirizzoCompleto = indirizzo + ", " + cap + ", " + citta;
                                 IndirizzoCompleto = IndirizzoCompleto.replaceAll(" ", "%20");
                                 System.out.println(IndirizzoCompleto);
-                                User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, (long)1, false);
+                                User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, Restaurant.id, false);
 
                                 String par = "NumeroTelefono=" + U.getNumeroTelefono();
                                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
@@ -643,7 +643,7 @@ public class activity_signin extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:123456789"));
+                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                 startActivity(callIntent);
             }
         }
@@ -663,7 +663,7 @@ public class activity_signin extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:123456789"));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the

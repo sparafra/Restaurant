@@ -513,7 +513,7 @@ public class activity_personalizza extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:123456789"));
+                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                 startActivity(callIntent);
             }
         }
@@ -539,7 +539,7 @@ public class activity_personalizza extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:123456789"));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the

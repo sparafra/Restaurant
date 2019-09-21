@@ -33,42 +33,42 @@
         </activity>
         <activity
             android:name=".activity_home"
-            android:label="Restaurant"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activity_ordini"
-            android:label="Restaurant"
+            android:label="Ordini"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activity_gestione_ordini"
-            android:label="Restaurant"
+            android:label="Gestione"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activity_info_ordine"
-            android:label="Restaurant"
+            android:label="Info Ordine"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activity_personalizza"
-            android:label="Restaurant"
+            android:label="Personalizza"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activity_carrello"
-            android:label="Restaurant"
+            android:label="Carrello"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activity_map"
-            android:label="Restaurant"
+            android:label="Mappa"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activity_signin"
-            android:label="Restaurant"
+            android:label="Registrati"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 

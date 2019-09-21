@@ -184,19 +184,19 @@ public class activity_gestione_ordini extends AppCompatActivity
                 switch (parent.getItemAtPosition(pos).toString())
                 {
                     case "Richiesto":
-                        par = "idLocale=1&Stato=Richiesto";
+                        par = "idLocale=" + Restaurant.id + "&Stato=Richiesto";
                         break;
                     case "In Preparazione":
-                        par = "idLocale=1&Stato=In%20Preparazione";
+                        par = "idLocale=" + Restaurant.id + "&Stato=In%20Preparazione";
                         break;
                     case "In Consegna":
-                        par = "idLocale=1&Stato=In%20Preparazione";
+                        par = "idLocale=" + Restaurant.id + "&Stato=In%20Consegna";
                         break;
                     case "Consegnato":
-                        par = "idLocale=1&Stato=In%20Preparazione";
+                        par = "idLocale=" + Restaurant.id + "&Stato=Consegnato";
                         break;
                     case "Tutto":
-                        par = "idLocale=1&Stato=all";
+                        par = "idLocale=" + Restaurant.id + "&Stato=all";
                         break;
                     default:
                         par="";
@@ -458,7 +458,7 @@ public class activity_gestione_ordini extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:123456789"));
+                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                 startActivity(callIntent);
             }
         }
@@ -484,7 +484,7 @@ public class activity_gestione_ordini extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:123456789"));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the
