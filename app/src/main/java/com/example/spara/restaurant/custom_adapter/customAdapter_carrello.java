@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.custom_adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,9 +12,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Cart;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class customAdapter_carrello extends SimpleAdapter {
         Cart cartProducts = (Cart) ((Activity) context).getIntent().getParcelableExtra("Cart");
 
         TextView Quantity = (TextView) view.findViewById(R.id.text1_2);
-        Quantity.setText("x" + cartProducts.getListProducts().get(position).Quantity);
+        Quantity.setText("x" + cartProducts.getListProducts().get(position).getQuantity());
 
         ImageView remove = (ImageView) view.findViewById(R.id.icon2);
         remove.setOnClickListener(new View.OnClickListener() {

@@ -1,11 +1,11 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.object;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class WebConnection extends Thread implements Parcelable  {
 
-    final String ipWebServer = "192.168.1.230";
+    final String ipWebServer = "212.237.3.25";
 
     public enum query {
         LISTACCOUNTS, INGREDIENTS, ORDERPRODUCTSUSER, BURGERFRIESINGREDIENTS, PIZZEINGREDIENTS, PRODUCTSINGREDIENTS, SALADSINGREDIENTS, INSERTUSER, INSERTORDER, INSERTORDERPRODUCT, INSERTPRODUCT,

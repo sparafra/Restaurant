@@ -22,7 +22,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -32,47 +32,47 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity_home"
+            android:name=".activity.activity_home"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activity_ordini"
+            android:name=".activity.activity_ordini"
             android:label="Ordini"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activity_gestione_ordini"
+            android:name=".activity.activity_gestione_ordini"
             android:label="Gestione"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activity_info_ordine"
+            android:name=".activity.activity_info_ordine"
             android:label="Info Ordine"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activity_personalizza"
+            android:name=".activity.activity_personalizza"
             android:label="Personalizza"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activity_carrello"
+            android:name=".activity.activity_carrello"
             android:label="Carrello"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activity_map"
+            android:name=".activity.activity_map"
             android:label="Mappa"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activity_signin"
+            android:name=".activity.activity_signin"
             android:label="Registrati"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
-        <service android:name=".Background"/>
+        <service android:name=".service.Background"/>
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCJWWoHpx4qlgenjXz77VxNAuWAvcw80aw"/>
     </application>
 

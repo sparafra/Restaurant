@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@drawable/margherita"
-    tools:context=".activity_personalizza"
+    tools:context=".activity.activity_personalizza"
     tools:showIn="@layout/app_bar_personalizza">
 
 

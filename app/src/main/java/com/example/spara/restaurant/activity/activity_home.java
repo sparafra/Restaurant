@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.activity;
 
 
 import java.io.BufferedReader;
@@ -22,11 +22,22 @@ import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
+
+import com.example.spara.restaurant.object.JSONUtility;
+import com.example.spara.restaurant.object.Preference;
+import com.example.spara.restaurant.service.Background;
+import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.object.Ingredient;
+import com.example.spara.restaurant.object.Product;
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.ReviewProduct;
+import com.example.spara.restaurant.object.User;
+import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -47,6 +58,8 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import static com.example.spara.restaurant.object.JSONUtility.fillProductsList;
 
 public class activity_home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -256,8 +269,8 @@ public class activity_home extends AppCompatActivity
                 showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
-                        String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.BURGERFRIESINGREDIENTS));
-                        fillProductsList(tmpJSON);
+                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.BURGERFRIESINGREDIENTS));
+                        listProducts = fillProductsList(tmpJSON);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -289,8 +302,8 @@ public class activity_home extends AppCompatActivity
                 new Thread(new Runnable() {
                     public void run() {
 
-                        String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.PIZZEINGREDIENTS));
-                        fillProductsList(tmpJSON);
+                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.PIZZEINGREDIENTS));
+                        listProducts = fillProductsList(tmpJSON);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -322,8 +335,8 @@ public class activity_home extends AppCompatActivity
                 showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
-                        String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SALADSINGREDIENTS));
-                        fillProductsList(tmpJSON);
+                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.SALADSINGREDIENTS));
+                        listProducts = fillProductsList(tmpJSON);
                         runOnUiThread(new Runnable() {
 
                             @Override
@@ -412,25 +425,7 @@ public class activity_home extends AppCompatActivity
         btnPizze.callOnClick();
 
     }
-    private String downloadJSON(final String urlWebService) {
 
-        try {
-            URL url = new URL(urlWebService);
-            System.out.println(urlWebService);
-
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString().trim();
-        } catch (Exception e) {
-            return null;
-        }
-    }
     private void showLoadingDialog() {
         pd = new ProgressDialog(this, R.style.DialogTheme);
         pd.setTitle("Loading...");
@@ -472,6 +467,8 @@ public class activity_home extends AppCompatActivity
         }
         list.setAdapter(adapter);
     }
+
+    /*
     private void fillProductsList(String json)
     {
         try {
@@ -493,8 +490,8 @@ public class activity_home extends AppCompatActivity
                         presente = true;
                     }
                 }
+                /
 
-                 */
                 if (!presente) {
                     P.setId(Integer.parseInt(obj.getString("id")));
                     P.setPrezzo(Float.parseFloat(obj.getString("Price")));
@@ -560,6 +557,7 @@ public class activity_home extends AppCompatActivity
 
         }catch (Exception e){e.printStackTrace();}
     }
+*/
 
     @Override
     public void onBackPressed() {
@@ -672,14 +670,14 @@ public class activity_home extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                callIntent.setData(Uri.parse("tel:"+ Restaurant.getNumeroTelefono()));
                 startActivity(callIntent);
             }
 
         }
         else if (id == R.id.nav_exit)
         {
-            savePreferences("", "", "");
+            Preference.savePreferences("", "", "", this);
             startActivity(new Intent(activity_home.this, MainActivity.class));
             activity_home.this.finish();
         }
@@ -699,7 +697,7 @@ public class activity_home extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the
@@ -717,7 +715,7 @@ public class activity_home extends AppCompatActivity
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    savePreferences("", "", "");
+                    Preference.savePreferences("", "", "", this);
                     startActivity(new Intent(activity_home.this, MainActivity.class));
                     activity_home.this.finish();
                 }
@@ -727,6 +725,8 @@ public class activity_home extends AppCompatActivity
             // permissions this app might request.
         }
     }
+
+    /*
     private void savePreferences(String NumeroTelefono, String Mail, String Password) {
         SharedPreferences settings = getSharedPreferences("alPachino",
                 Context.MODE_PRIVATE);
@@ -738,4 +738,5 @@ public class activity_home extends AppCompatActivity
         editor.putString("Password", Password);
         editor.commit();
     }
+     */
 }

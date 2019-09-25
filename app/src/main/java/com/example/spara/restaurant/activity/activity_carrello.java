@@ -1,6 +1,7 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,19 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.example.spara.restaurant.object.AlertDialogFragment;
+import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.object.Ingredient;
+import com.example.spara.restaurant.object.JSONUtility;
+import com.example.spara.restaurant.object.Notice;
+import com.example.spara.restaurant.object.Order;
+import com.example.spara.restaurant.object.Preference;
+import com.example.spara.restaurant.object.Product;
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.User;
+import com.example.spara.restaurant.object.WebConnection;
+import com.example.spara.restaurant.custom_adapter.customAdapter_carrello;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;
@@ -252,9 +266,9 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                                 InsertOrderProduct(O);
 
 
-                                String par = "idLocale=" + Restaurant.id + "&Amministratore=true";
-                                String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ADMINLIST, par));
-                                List<User> AdminUsers = fillUsers(tmpJSON);
+                                String par = "idLocale=" + Restaurant.getId() + "&Amministratore=true";
+                                String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.ADMINLIST, par));
+                                List<User> AdminUsers = JSONUtility.fillUsers(tmpJSON);
 
                                 for(int k=0; k<AdminUsers.size(); k++)
                                 {
@@ -262,7 +276,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                                     N.setStato(false);
                                     N.setRicevutoDa(AdminUsers.get(k).getNumeroTelefono());
                                     N.setMessaggio("Ricevuto nuovo ordine con id: " + O.getId());
-                                    N.setIdLocale(Restaurant.id);
+                                    N.setIdLocale(Restaurant.getId());
                                     N.setCreatoDa(O.getNumeroTelefono());
 
                                     par = "Stato=" + N.getStato() + "&CreatoDa=" + N.getCreatoDa() + "&Messaggio=" + N.getMessaggio().replaceAll(" ", "%20") + "&idLocale=" + N.getIdLocale() +"&RicevutoDa=" + N.getRicevutoDa();
@@ -358,7 +372,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             System.out.println(O.getListProducts().get(k).getNome());
             if (O.getListProducts().get(k).getNome().equals("Personalizzata")) {
 
-                par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&Tipo=" + O.getListProducts().get(k).getTipo() +"&idLocale=" + Restaurant.id + "&ImageURL="+ O.getListProducts().get(k).getImageURL() ;
+                par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&Tipo=" + O.getListProducts().get(k).getTipo() +"&idLocale=" + Restaurant.getId() + "&ImageURL="+ O.getListProducts().get(k).getImageURL() ;
                 idProductEdited = InsertIntoDBWithId(Connection.getURL(WebConnection.query.INSERTPRODUCT, par));
 
                 //par = "idProdotto=" + String.valueOf(idProductEdited) + "&Tipo=" + O.getListProducts().get(k).getTipo();
@@ -382,6 +396,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
 
         }
     }
+
+    /*
     private String downloadJSON(final String urlWebService) {
 
         try {
@@ -426,6 +442,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             return list;
         }
     }
+    */
+
     private void InsertIntoDB(final String urlWebService) {
 
         try {
@@ -613,13 +631,13 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:123456789"));
+                callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                 startActivity(callIntent);
             }
         }
         else if (id == R.id.nav_exit)
         {
-            savePreferences("", "", "");
+            Preference.savePreferences("", "", "", this);
             startActivity(new Intent(activity_carrello.this, MainActivity.class));
             activity_carrello.this.finish();
         }
@@ -639,7 +657,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the
@@ -657,7 +675,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    savePreferences("", "", "");
+                    Preference.savePreferences("", "", "", this);
                     startActivity(new Intent(activity_carrello.this, MainActivity.class));
                     activity_carrello.this.finish();
                 }
@@ -667,8 +685,10 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             // permissions this app might request.
         }
     }
-    private void savePreferences(String NumeroTelefono, String Mail, String Password) {
-        SharedPreferences settings = getSharedPreferences("alPachino",
+
+    /*
+    private void savePreferences(String NumeroTelefono, String Mail, String Password, Activity act) {
+        SharedPreferences settings = act.getSharedPreferences("alPachino",
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
 
@@ -678,4 +698,5 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         editor.putString("Password", Password);
         editor.commit();
     }
+    */
 }

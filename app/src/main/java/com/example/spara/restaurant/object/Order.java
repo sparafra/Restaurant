@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.object;
 
 import java.util.ArrayList;
 import java.util.Date;

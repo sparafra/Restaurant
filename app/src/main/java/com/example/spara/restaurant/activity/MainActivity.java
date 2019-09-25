@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -17,6 +17,13 @@ import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
+
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.object.Preference;
+import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.User;
+import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;
@@ -42,6 +49,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import static com.example.spara.restaurant.object.JSONUtility.downloadJSON;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -123,7 +132,7 @@ public class MainActivity extends AppCompatActivity
                 new Thread(new Runnable() {
                     public void run() {
                         try {
-                            String par = "idLocale=" + Restaurant.id + "&Mail=" + mail;
+                            String par = "idLocale=" + Restaurant.getId() + "&Mail=" + mail;
                             System.out.println(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
                             String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
                             System.out.println("--" + tmpJSON);
@@ -155,7 +164,7 @@ public class MainActivity extends AppCompatActivity
                                 System.out.println(txtPassword.getText().toString());
                                 if(UserLogged.getPassword().equals(txtPassword.getText().toString().trim()) && UserLogged.getConfermato() == true && UserLogged.getDisabilitato() == false) {
 
-                                    savePreferences(UserLogged.getNumeroTelefono(), UserLogged.getMail(), UserLogged.getPassword());
+                                    Preference.savePreferences(UserLogged.getNumeroTelefono(), UserLogged.getMail(), UserLogged.getPassword(), MainActivity.this);
                                     cartProducts = new Cart();
 
                                     runOnUiThread(new Runnable() {
@@ -308,12 +317,13 @@ public class MainActivity extends AppCompatActivity
                 if(!NumeroTelefono.equals("") && !Mail.equals("") && !Password.equals(""))
                 {
                     try{
-                        String par = "idLocale=1&Mail=" + Mail;
+                        String par = "idLocale=" + Restaurant.getId() + "&Mail=" + Mail;
                         String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
                         JSONArray jsonArray = new JSONArray(tmpJSON);
                         if (jsonArray.length() > 0) {
                             JSONObject obj = jsonArray.getJSONObject(0);
                             UserLogged = new User();
+
                             UserLogged.setMail(obj.getString("Mail"));
                             UserLogged.setCognome(obj.getString("Cognome"));
                             UserLogged.setPassword(obj.getString("Password"));
@@ -364,6 +374,7 @@ public class MainActivity extends AppCompatActivity
         pd.setCancelable(false);
         pd.show();
     }
+    /*
     private void savePreferences(String NumeroTelefono, String Mail, String Password) {
         SharedPreferences settings = getSharedPreferences("alPachino",
                 Context.MODE_PRIVATE);
@@ -375,6 +386,7 @@ public class MainActivity extends AppCompatActivity
         editor.putString("Password", Password);
         editor.commit();
     }
+     */
     private void loadPreferences() {
 
         SharedPreferences settings = getSharedPreferences("alPachino",
@@ -385,6 +397,8 @@ public class MainActivity extends AppCompatActivity
         Mail = settings.getString("Mail", "");
         Password = settings.getString("Password", "");
     }
+
+    /*
     private String downloadJSON(final String urlWebService) {
 
         try {
@@ -406,6 +420,8 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+
+     */
 
 
     @Override
@@ -491,7 +507,7 @@ public class MainActivity extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                 startActivity(callIntent);
             }
         }
@@ -511,7 +527,7 @@ public class MainActivity extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the
@@ -529,7 +545,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    savePreferences("", "", "");
+                    Preference.savePreferences("", "", "", this);
 
                 }
                 return;

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activity_info_ordine">
+    tools:context=".activity.activity_info_ordine">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

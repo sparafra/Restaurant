@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@drawable/margherita"
-    tools:context=".activity_gestione_ordini"
+    tools:context=".activity.activity_gestione_ordini"
     tools:showIn="@layout/app_bar_gestione_ordini">
 
 

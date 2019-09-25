@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -8,6 +8,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+
+import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.User;
+import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;
@@ -29,6 +35,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import static com.example.spara.restaurant.object.Preference.savePreferences;
 
 public class activity_map extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,  OnMapReadyCallback{
@@ -227,7 +235,7 @@ public class activity_map extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                callIntent.setData(Uri.parse("tel:"+ Restaurant.getNumeroTelefono()));
                 startActivity(callIntent);
             }
         }
@@ -235,7 +243,7 @@ public class activity_map extends AppCompatActivity
         {
             if(!UserLogged.getNumeroTelefono().equals("")) {
 
-                savePreferences("", "", "");
+                savePreferences("", "", "", this);
                 startActivity(new Intent(activity_map.this, MainActivity.class));
                 activity_map.this.finish();
             }
@@ -261,7 +269,7 @@ public class activity_map extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the
@@ -279,7 +287,7 @@ public class activity_map extends AppCompatActivity
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    savePreferences("", "", "");
+                    savePreferences("", "", "", this);
                     startActivity(new Intent(activity_map.this, MainActivity.class));
                     activity_map.this.finish();
                 }
@@ -289,6 +297,7 @@ public class activity_map extends AppCompatActivity
             // permissions this app might request.
         }
     }
+    /*
     private void savePreferences(String NumeroTelefono, String Mail, String Password) {
         SharedPreferences settings = getSharedPreferences("alPachino",
                 Context.MODE_PRIVATE);
@@ -300,6 +309,8 @@ public class activity_map extends AppCompatActivity
         editor.putString("Password", Password);
         editor.commit();
     }
+
+     */
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

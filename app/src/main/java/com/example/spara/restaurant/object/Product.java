@@ -1,8 +1,7 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.object;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;

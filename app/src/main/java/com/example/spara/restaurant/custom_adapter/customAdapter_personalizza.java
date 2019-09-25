@@ -1,8 +1,7 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.custom_adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +9,11 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
+
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.activity.activity_personalizza;
+import com.example.spara.restaurant.object.Ingredient;
 
 import java.util.HashMap;
 import java.util.List;

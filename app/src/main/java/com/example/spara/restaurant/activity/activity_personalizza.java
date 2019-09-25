@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -6,10 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
+
+import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.object.Ingredient;
+import com.example.spara.restaurant.object.Product;
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.User;
+import com.example.spara.restaurant.object.WebConnection;
+import com.example.spara.restaurant.custom_adapter.customAdapter_personalizza;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;
@@ -28,7 +35,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -41,6 +47,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.example.spara.restaurant.object.JSONUtility.downloadJSON;
+import static com.example.spara.restaurant.object.JSONUtility.fillIngredientList;
+import static com.example.spara.restaurant.object.Preference.savePreferences;
 
 public class activity_personalizza extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -126,7 +136,7 @@ public class activity_personalizza extends AppCompatActivity
         new Thread(new Runnable() {
             public void run() {
                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.INGREDIENTS));
-                fillIngredientList(tmpJSON);
+                listIngredients = fillIngredientList(tmpJSON);
                 runOnUiThread(new Runnable() {
 
                     @Override
@@ -330,6 +340,7 @@ public class activity_personalizza extends AppCompatActivity
         });
 
     }
+    /*
     private String downloadJSON(final String urlWebService) {
 
         try {
@@ -349,6 +360,9 @@ public class activity_personalizza extends AppCompatActivity
         }
     }
 
+     */
+
+    /*
     private void fillIngredientList(String json) {
         try {
             listIngredients = new ArrayList<>();
@@ -364,6 +378,8 @@ public class activity_personalizza extends AppCompatActivity
             }
         }catch (Exception e){e.printStackTrace();}
     }
+
+     */
 
     public void loadIntoIngredientListView()
     {
@@ -513,13 +529,13 @@ public class activity_personalizza extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                callIntent.setData(Uri.parse("tel:"+ Restaurant.getNumeroTelefono()));
                 startActivity(callIntent);
             }
         }
         else if (id == R.id.nav_exit)
         {
-            savePreferences("", "", "");
+            savePreferences("", "", "", this);
             startActivity(new Intent(activity_personalizza.this, MainActivity.class));
             activity_personalizza.this.finish();
         }
@@ -539,7 +555,7 @@ public class activity_personalizza extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the
@@ -557,7 +573,7 @@ public class activity_personalizza extends AppCompatActivity
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    savePreferences("", "", "");
+                    savePreferences("", "", "", this);
                     startActivity(new Intent(activity_personalizza.this, MainActivity.class));
                     activity_personalizza.this.finish();
                 }
@@ -567,6 +583,7 @@ public class activity_personalizza extends AppCompatActivity
             // permissions this app might request.
         }
     }
+    /*
     private void savePreferences(String NumeroTelefono, String Mail, String Password) {
         SharedPreferences settings = getSharedPreferences("alPachino",
                 Context.MODE_PRIVATE);
@@ -578,5 +595,5 @@ public class activity_personalizza extends AppCompatActivity
         editor.putString("Password", Password);
         editor.commit();
     }
-
+    */
 }

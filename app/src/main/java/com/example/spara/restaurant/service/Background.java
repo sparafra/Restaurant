@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.service;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,6 +11,14 @@ import android.net.Uri;
 import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
+
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.activity.activity_home;
+import com.example.spara.restaurant.activity.activity_info_ordine;
+import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.object.Notice;
+import com.example.spara.restaurant.object.User;
+import com.example.spara.restaurant.object.WebConnection;
 
 import org.json.JSONArray;
 import org.json.JSONException;

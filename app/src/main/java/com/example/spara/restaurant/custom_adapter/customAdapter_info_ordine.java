@@ -1,19 +1,21 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.custom_adapter;
 
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.activity.activity_info_ordine;
+import com.example.spara.restaurant.object.Order;
+import com.example.spara.restaurant.object.Product;
+import com.example.spara.restaurant.object.WebConnection;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class customAdapter_info_ordine extends SimpleAdapter {
         View view = super.getView(position, convertView, parent);
 
         TextView Quantity = (TextView) view.findViewById(R.id.text1_2);
-        Quantity.setText("x" + listProducts.get(position).Quantity);
+        Quantity.setText("x" + listProducts.get(position).getQuantity());
 
         ImageView remove = (ImageView) view.findViewById(R.id.icon2);
         remove.setOnClickListener(new View.OnClickListener() {

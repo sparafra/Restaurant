@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -9,6 +9,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 
+import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.User;
+import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;
@@ -30,13 +35,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import com.example.spara.restaurant.object.Restaurant;
+
+import static com.example.spara.restaurant.object.JSONUtility.downloadJSON;
 
 public class activity_signin extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -161,7 +169,7 @@ public class activity_signin extends AppCompatActivity
                                 String IndirizzoCompleto = indirizzo + ", " + cap + ", " + citta;
                                 IndirizzoCompleto = IndirizzoCompleto.replaceAll(" ", "%20");
                                 System.out.println(IndirizzoCompleto);
-                                User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, Restaurant.id, false);
+                                User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, Restaurant.getId(), false);
 
                                 String par = "NumeroTelefono=" + U.getNumeroTelefono();
                                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
@@ -520,6 +528,7 @@ public class activity_signin extends AppCompatActivity
 
     }
 
+    /*
     private String downloadJSON(final String urlWebService) {
 
         try {
@@ -540,6 +549,8 @@ public class activity_signin extends AppCompatActivity
         }
 
     }
+
+     */
     private void showLoadingDialog() {
         pd = new ProgressDialog(this, R.style.DialogTheme);
         pd.setTitle("Loading...");
@@ -643,7 +654,7 @@ public class activity_signin extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                callIntent.setData(Uri.parse("tel:" + Restaurant.getNumeroTelefono()));
                 startActivity(callIntent);
             }
         }
@@ -663,7 +674,7 @@ public class activity_signin extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the

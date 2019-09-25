@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.object;
 
 public class Restaurant {
 
@@ -11,32 +11,32 @@ public class Restaurant {
 
     public Restaurant(){}
 
-    public Long getId() {
+    public static Long getId() {
         return id;
     }
 
 
-    public String getNome() {
+    public static String getNome() {
         return Nome;
     }
 
 
-    public String getIndirizzo() {
+    public static String getIndirizzo() {
         return Indirizzo;
     }
 
 
-    public String getNumeroTelefono() {
+    public static String getNumeroTelefono() {
         return NumeroTelefono;
     }
 
 
-    public String getMail() {
+    public static String getMail() {
         return Mail;
     }
 
 
-    public boolean getAttivo() {
+    public static boolean getAttivo() {
         return Attivo;
     }
 

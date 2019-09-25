@@ -1,4 +1,4 @@
-package com.example.spara.restaurant;
+package com.example.spara.restaurant.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -8,6 +8,18 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+
+import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.object.Ingredient;
+import com.example.spara.restaurant.object.JSONUtility;
+import com.example.spara.restaurant.object.Order;
+import com.example.spara.restaurant.object.Preference;
+import com.example.spara.restaurant.object.Product;
+import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.User;
+import com.example.spara.restaurant.object.WebConnection;
+import com.example.spara.restaurant.custom_adapter.customAdapter_info_ordine;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -29,7 +41,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -48,6 +59,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import static com.example.spara.restaurant.object.JSONUtility.*;
 
 public class activity_info_ordine extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -150,10 +163,10 @@ public class activity_info_ordine extends AppCompatActivity
             public void run() {
                 String par = "idOrdine=" + idOrdine;
                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDER, par));
-                fillOrder(tmpJSON);
+                O = fillOrder(tmpJSON);
                 par = "NumeroTelefono=" + O.getNumeroTelefono() ;
                 tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
-                fillUser(tmpJSON);
+                U = fillUser(tmpJSON);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -283,11 +296,11 @@ public class activity_info_ordine extends AppCompatActivity
 
                                 String par = "idOrdine=" + idOrdine;
                                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDER, par));
-                                fillOrder(tmpJSON);
+                                O = fillOrder(tmpJSON);
                                 par = "NumeroTelefono=" + O.getNumeroTelefono();
                                 System.out.println(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
                                 tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
-                                fillUser(tmpJSON);
+                                U = fillUser(tmpJSON);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -357,6 +370,7 @@ public class activity_info_ordine extends AppCompatActivity
         }
     }
 
+    /*
     private String downloadJSON(final String urlWebService) {
 
         try {
@@ -375,10 +389,11 @@ public class activity_info_ordine extends AppCompatActivity
             return null;
         }
     }
-
+*/
     public Order getOrder(){return O;}
     public WebConnection getConnection(){return Connection;}
 
+    /*
     private void fillOrder(String json) {
 
         try {
@@ -442,6 +457,9 @@ public class activity_info_ordine extends AppCompatActivity
 
         }catch (Exception e){e.printStackTrace();}
     }
+    */
+
+    /*
     private void fillUser(String json) {
 
         try {
@@ -462,6 +480,8 @@ public class activity_info_ordine extends AppCompatActivity
 
         }catch (Exception e){e.printStackTrace();}
     }
+
+     */
     private void loadIntoProductListView(List<Product> listP)
     {
         List<HashMap<String, String>> listitems = new ArrayList<>();
@@ -606,13 +626,13 @@ public class activity_info_ordine extends AppCompatActivity
             } else {
                 // Permission has already been granted
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                callIntent.setData(Uri.parse("tel:"+ Restaurant.getNumeroTelefono()));
                 startActivity(callIntent);
             }
         }
         else if (id == R.id.nav_exit)
         {
-            savePreferences("", "", "");
+            Preference.savePreferences("", "", "", this);
             startActivity(new Intent(activity_info_ordine.this, MainActivity.class));
             activity_info_ordine.this.finish();
         }
@@ -632,7 +652,7 @@ public class activity_info_ordine extends AppCompatActivity
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.NumeroTelefono));
+                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
                     startActivity(callIntent);
                 } else {
                     // permission denied, boo! Disable the
@@ -650,7 +670,7 @@ public class activity_info_ordine extends AppCompatActivity
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    savePreferences("", "", "");
+                    Preference.savePreferences("", "", "", this);
                     startActivity(new Intent(activity_info_ordine.this, MainActivity.class));
                     activity_info_ordine.this.finish();
                 }
@@ -660,6 +680,8 @@ public class activity_info_ordine extends AppCompatActivity
             // permissions this app might request.
         }
     }
+
+    /*
     private void savePreferences(String NumeroTelefono, String Mail, String Password) {
         SharedPreferences settings = getSharedPreferences("alPachino",
                 Context.MODE_PRIVATE);
@@ -671,5 +693,5 @@ public class activity_info_ordine extends AppCompatActivity
         editor.putString("Password", Password);
         editor.commit();
     }
-
+    */
 }
