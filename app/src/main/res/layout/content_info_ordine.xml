@@ -118,15 +118,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="40dp"
         android:layout_marginEnd="8dp"
         android:enabled="false"
         android:text="Domicilio  "
         android:textColor="@drawable/White"
+
         android:theme="@style/SwitchTheme"
+        android:thumb="@drawable/switch_selector"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/Indirizzo"
-        app:layout_constraintTop_toBottomOf="@+id/Nominativo" />
+        app:layout_constraintTop_toBottomOf="@+id/listProducts" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

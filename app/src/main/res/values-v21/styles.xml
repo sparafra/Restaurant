@@ -13,5 +13,8 @@
     <style name="SwitchTheme" parent="Theme.AppCompat.Light">
         <item name="android:textColorPrimaryDisableOnly">#00838f</item>
         <item name="colorAccent">#148E13</item>
+        <item name="android:textColor">@drawable/White</item>
+
     </style>
+
 </resources>
