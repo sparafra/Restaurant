@@ -11,7 +11,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.example.spara.restaurant.object.AlertDialogFragment;
 import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.object.ChangeDeliveryDialogFragment;
 import com.example.spara.restaurant.object.Ingredient;
 import com.example.spara.restaurant.object.JSONUtility;
 import com.example.spara.restaurant.object.Order;
@@ -22,6 +24,9 @@ import com.example.spara.restaurant.object.Restaurant;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.example.spara.restaurant.custom_adapter.customAdapter_info_ordine;
+import com.github.angads25.toggle.interfaces.OnToggledListener;
+import com.github.angads25.toggle.model.ToggleableView;
+import com.github.angads25.toggle.widget.LabeledSwitch;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -33,6 +38,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,7 +72,7 @@ import java.util.Locale;
 import static com.example.spara.restaurant.object.JSONUtility.*;
 
 public class activity_info_ordine extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, ChangeDeliveryDialogFragment.EditNameDialogListener{
 
     Order O;
     User U;
@@ -83,7 +90,7 @@ public class activity_info_ordine extends AppCompatActivity
     TextView Nominativo;
     TextView OrderId;
     TextView CostoTotale;
-    Switch Domicilio;
+    LabeledSwitch Domicilio;
     ImageView deleteOrder;
 
     int posSelected = -1;
@@ -174,7 +181,7 @@ public class activity_info_ordine extends AppCompatActivity
                     public void run() {
                         // Stuff that updates the UI
                         loadIntoProductListView(O.getListProducts());
-                        Domicilio.setChecked(O.getAsporto());
+                        Domicilio.setOn(O.getAsporto());
 
                         Nominativo.setText(U.getNome() + " " + U.getCognome());
                         Indirizzo.setText(U.getIndirizzo());
@@ -309,7 +316,7 @@ public class activity_info_ordine extends AppCompatActivity
                                     public void run() {
                                         // Stuff that updates the UI
                                         loadIntoProductListView(O.getListProducts());
-                                        Domicilio.setChecked(O.getAsporto());
+                                        Domicilio.setOn(O.getAsporto());
                                         Nominativo.setText(U.getNome() + " " + U.getCognome());
                                         Indirizzo.setText(U.getIndirizzo());
                                         OrderId.setText("Order ID: " + O.getId());
@@ -342,7 +349,14 @@ public class activity_info_ordine extends AppCompatActivity
                 }).start();
             }
         });
-
+        OnToggledListener x = new OnToggledListener() {
+            @Override
+            public void onSwitched(ToggleableView toggleableView, boolean isOn) {
+                System.out.println("EVENT");
+                showAlertDialog();
+            }
+        };
+        Domicilio.setOnToggledListener(x);
     }
     private void showLoadingDialog() {
         pd = new ProgressDialog(this, R.style.DialogTheme);
@@ -350,6 +364,40 @@ public class activity_info_ordine extends AppCompatActivity
         pd.setMessage("Please wait.");
         pd.setCancelable(false);
         pd.show();
+    }
+    private void showAlertDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        ChangeDeliveryDialogFragment alertDialog = ChangeDeliveryDialogFragment.newInstance("Sei sicuro di voler cambiare?");
+        alertDialog.show(fm, "fragment_alert");
+    }
+    @Override
+    public void onFinishEditDialog(String inputText) {
+        //Toast.makeText(this, "Hi, " + inputText, Toast.LENGTH_SHORT).show();
+        if(inputText.equals("Si"))
+        {
+            System.out.println("Si");
+            new Thread(new Runnable() {
+                public void run() {
+
+                    SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+                    SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
+                    String dateStr = date.format(O.getDateTime());
+                    String timeStr = time.format(O.getDateTime());
+
+                    O.setAsporto(Domicilio.isOn());
+
+                    String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr + "&Costo=" + O.getTotaleCosto();
+                    InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
+                    pd.dismiss();
+
+                }
+            }).start();
+        }
+        else
+        {
+            Domicilio.setOn(!Domicilio.isOn());
+        }
+
     }
     public void InsertIntoDB(final String urlWebService) {
 
