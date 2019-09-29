@@ -32,43 +32,44 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/listProdotti" />
 
+    <ImageView
+        android:id="@+id/call"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/baseline_phone_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/deleteOrder"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listProdotti" />
+
     <ListView
         android:id="@+id/listProducts"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Spinner
-        android:id="@+id/sp_change_status"
+
+
+    <lib.kingja.switchbutton.SwitchMultiButton
+        android:id="@+id/status"
         android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Indirizzo" />
-
-    <Button
-        android:id="@+id/btn_change_status"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/buttonlogin"
-        android:text="Cambia Stato"
-        android:textColor="#ffff"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/deleteOrder"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/sp_change_status"
-        app:layout_constraintTop_toBottomOf="@+id/Indirizzo" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/CostoTotale"
+        app:selectedColor="#64B5F6"
+        app:selectedTab="0"
+        app:strokeRadius="5dp"
+        app:strokeWidth="1dp"
+        app:switchTabs="@array/order_status_array"
+        app:textSize="12sp" />
 
     <TextView
         android:id="@+id/Indirizzo"

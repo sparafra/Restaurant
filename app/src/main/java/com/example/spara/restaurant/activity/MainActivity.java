@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         System.out.println("onCreate");
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -104,6 +106,33 @@ public class MainActivity extends AppCompatActivity
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.INTERNET)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET},
+                        2);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+
+        }
 
 
         Button login = findViewById(R.id.login);
@@ -398,7 +427,7 @@ public class MainActivity extends AppCompatActivity
         Password = settings.getString("Password", "");
     }
 
-    /*
+
     private String downloadJSON(final String urlWebService) {
 
         try {
@@ -421,7 +450,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-     */
+
 
 
     @Override
@@ -506,9 +535,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else {
                 // Permission has already been granted
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                startActivity(callIntent);
+                callPhone(Restaurant.getNumeroTelefono());
             }
         }
 
@@ -526,9 +553,7 @@ public class MainActivity extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                    startActivity(callIntent);
+                    callPhone(Restaurant.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -568,5 +593,12 @@ public class MainActivity extends AppCompatActivity
                     Log.i("CHIAMATA IN USCITA",   "IDLE");
             }
         }
+    }
+
+    public void callPhone(String Numero)
+    {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel: "+ Numero));
+        startActivity(callIntent);
     }
 }

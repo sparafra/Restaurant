@@ -1,17 +1,18 @@
 package com.example.spara.restaurant.service;
 
-import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
@@ -23,10 +24,6 @@ import com.example.spara.restaurant.object.Notice;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -34,7 +31,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Background extends Service {
+import static com.example.spara.restaurant.object.JSONUtility.*;
+
+public class background_alarm extends BroadcastReceiver {
+
 
     WebConnection Connection;
     User UserLogged;
@@ -47,47 +47,28 @@ public class Background extends Service {
 
     String CHANNEL_ID = "alpachino";
 
-    public Background() {
-    }
+    @Override
+    public void onReceive(Context context, Intent intent) {
 
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        /*
-        if (intent != null && intent.getExtras() != null) {
-            UserNumber = (String) intent.getExtras().get("UserNumber");
-        }*/
-        onTaskRemoved(intent);
+        new Thread(new Runnable() {
+            public void run() {
 
-        return START_STICKY;
-    }
+                System.out.println("Background Service Fire");
+                if (intent.getAction() != null && intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
 
-    public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implement");
-    }
+                    //Intent serviceIntent = new Intent(context, MyService.class);
+                    //context.startService(serviceIntent);
+                }
 
-    public void onTaskRemoved(Intent rootIntent) {
-        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
-        restartServiceIntent.setPackage(getPackageName());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(restartServiceIntent);
-        }
-        startService(restartServiceIntent);
-        super.onTaskRemoved(rootIntent);
-    }
+                Connection = new WebConnection();
+                loadPreferences(context);
+                String par = "NumeroTelefono=" + UserNumber;
+                String json = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
+                UserLogged = fillUser(json);
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            Connection = new WebConnection();
-            loadPreferences();
-            String par ="NumeroTelefono=" + UserNumber ;
-            String json = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
-            fillUser(json);
+                createNotificationChannel(context);
 
-            createNotificationChannel();
 
-            while (true) {
-                // put your socket-code here
-                loadPreferences();
                 if (!UserNumber.equals("") && !Mail.equals("") && !Password.equals("")) {
                     try {
                         par = "NumeroTelefono=" + UserNumber;
@@ -95,12 +76,12 @@ public class Background extends Service {
                         json = downloadJSON(Connection.getURL(WebConnection.query.NOTICE, par));
                         System.out.println(Connection.getURL(WebConnection.query.NOTICE, par));
                         listNotice = new ArrayList<>();
-                        fillNoticeList(json, listNotice);
+                        listNotice = fillNoticeList(json);
                         System.out.println(listNotice.size());
                         for (int k = 0; k < listNotice.size(); k++) {
                             //Switch notify message
 
-                            addNotification(listNotice.get(k).getTitolo(), listNotice.get(k).getMessaggio(), k, listNotice.get(k).getTipo());
+                            addNotification(listNotice.get(k).getTitolo(), listNotice.get(k).getMessaggio(), k, listNotice.get(k).getTipo(), context);
                         }
                         for (int k = 0; k < listNotice.size(); k++) {
                             //Update notice on database by state=0 to state=1
@@ -112,54 +93,15 @@ public class Background extends Service {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    try {
-                        //SystemClock.sleep(150000);
-                        //
-                        // Thread.sleep(150000); //sleep di 2.5 minuti
-                        Thread.sleep(90000); //sleep di 1.5 minuti
-                    } catch (Exception e) {
-                    }
+
                 }
-            }
-        }
-    };
-
-    private void fillUser(String json) {
-
-        try {
-            UserLogged = new User();
-            JSONObject obj = new JSONObject(json);
-
-            UserLogged.setNumeroTelefono(obj.getString("NumeroTelefono"));
-            UserLogged.setMail(obj.getString("Mail"));
-            UserLogged.setPassword(obj.getString("Password"));
-            UserLogged.setNome(obj.getString("Nome"));
-            UserLogged.setCognome(obj.getString("Cognome"));
-            UserLogged.setIndirizzo(obj.getString("Indirizzo"));
-            UserLogged.setAmministratore(obj.getBoolean("Amministratore"));
-            UserLogged.setConfermato(obj.getBoolean("Confermato"));
-            UserLogged.setIdLocale(obj.getLong("idLocale"));
-            UserLogged.setDisabilitato(obj.getBoolean("Disabilitato"));
-
-        }catch (Exception e){e.printStackTrace();}
-    }
-
-    @Override
-    public void onCreate() {
-        // TODO Auto-generated method stub
-        super.onCreate();
-        new Thread(runnable).start();
-
-        //start a separate thread and start listening to your network object
-
-            //Log.i("PROVA SERVICE", "Evento n."+n++);
-            System.out.println("BackgroundService");
+            }}).start();
 
     }
 
-    private void loadPreferences() {
+    private void loadPreferences(Context context) {
 
-        SharedPreferences settings = getSharedPreferences("alPachino",
+        SharedPreferences settings = context.getSharedPreferences("alPachino",
                 Context.MODE_PRIVATE);
 
         // Get value
@@ -167,14 +109,14 @@ public class Background extends Service {
         Mail = settings.getString("Mail", "");
         Password = settings.getString("Password", "");
     }
-    private void addNotification(String Title, String Message, int id, String Tipo) {
+    private void addNotification(String Title, String Message, int id, String Tipo, Context context) {
 
         System.out.println("START NOTIFICATION");
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
 
         NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this, CHANNEL_ID)
+                new NotificationCompat.Builder(context, CHANNEL_ID)
                         .setSmallIcon(R.drawable.logo)
                         .setContentTitle(Title)
                         .setContentText(Message)
@@ -190,7 +132,7 @@ public class Background extends Service {
         //System.out.println(Integer.parseInt(Message.substring(Message.indexOf(": ")+2)));
         Intent notificationIntent;
         try {
-            notificationIntent = new Intent(this, activity_info_ordine.class);
+            notificationIntent = new Intent(context, activity_info_ordine.class);
             notificationIntent.putExtra("Cart", cartProducts);
             notificationIntent.putExtra("User", UserLogged);
             notificationIntent.putExtra("WebConnection", Connection);
@@ -199,12 +141,12 @@ public class Background extends Service {
 
 
         }catch (Exception e){
-            notificationIntent = new Intent(this, activity_home.class);
+            notificationIntent = new Intent(context, activity_home.class);
             notificationIntent.putExtra("Cart", cartProducts);
             notificationIntent.putExtra("User", UserLogged);
             notificationIntent.putExtra("WebConnection", Connection);
         }
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         builder.setContentIntent(contentIntent);
@@ -219,40 +161,22 @@ public class Background extends Service {
         }
         */
         // Add as notification
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(id, builder.build());
     }
-    private void createNotificationChannel() {
+    private void createNotificationChannel(Context context) {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
+            CharSequence name = context.getString(R.string.channel_name);
+            String description = context.getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
-        }
-    }
-    private String downloadJSON(final String urlWebService) {
-
-        try {
-            URL url = new URL(urlWebService);
-
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString().trim();
-        } catch (Exception e) {
-            return null;
         }
     }
     private void InsertIntoDB(final String urlWebService) {
@@ -275,26 +199,5 @@ public class Background extends Service {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    private void fillNoticeList(String json, List<Notice> list)throws JSONException {
-
-        JSONArray jsonArray = new JSONArray(json);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject obj = jsonArray.getJSONObject(i);
-
-            Notice N = new Notice();
-            N.setIdAvviso(obj.getInt("idAvviso"));
-            N.setCreatoDa(obj.getString("CreatoDa"));
-            N.setIdLocale(obj.getLong("idLocale"));
-            N.setMessaggio(obj.getString("Messaggio"));
-            N.setRicevutoDa(obj.getString("RicevutoDa"));
-            N.setTipo(obj.getString("Tipo"));
-            N.setTitolo(obj.getString("Titolo"));
-            N.setStato(obj.getBoolean("Stato"));
-
-
-            list.add(N);
-        }
-
     }
 }

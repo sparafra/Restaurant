@@ -54,6 +54,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import lib.kingja.switchbutton.SwitchMultiButton;
+
 public class activity_gestione_ordini extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -67,6 +69,8 @@ public class activity_gestione_ordini extends AppCompatActivity
 
     ListView listOrder;
     ListView listProducts;
+
+    SwitchMultiButton filter;
 
     int posSelected = -1;
 
@@ -101,6 +105,8 @@ public class activity_gestione_ordini extends AppCompatActivity
 
         //MY CODE
 
+        /*
+
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
 // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -109,7 +115,7 @@ public class activity_gestione_ordini extends AppCompatActivity
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
-
+        */
 
 
         //Background Image Declaration
@@ -133,24 +139,24 @@ public class activity_gestione_ordini extends AppCompatActivity
         }
         //Toast.makeText(getApplicationContext(), UserLogged.getNumeroTelefono(), Toast.LENGTH_SHORT).show();
 
-        /*
-        String par = "Stato=Richiesto";
+
+        String par = "idLocale=" + Restaurant.getId() + "&Stato=Richiesto";
         showLoadingDialog();
-        new Thread(new Runnable() {
-            public void run() {
-                String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
-                fillOrderList(tmpJSON);
-                runOnUiThread(new Runnable() {
-                    @Override
+                new Thread(new Runnable() {
                     public void run() {
-                        // Stuff that updates the UI
-                        loadIntoOrderListView();
-                        pd.dismiss();
+                        System.out.println(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
+                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
+                        fillOrderList(tmpJSON);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Stuff that updates the UI
+                                loadIntoOrderListView();
+                                pd.dismiss();
+                            }
+                        });
                     }
-                });
-            }
-        }).start();
-        */
+                }).start();
 
         //ListView Click on Item Event
         listOrder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -185,6 +191,7 @@ public class activity_gestione_ordini extends AppCompatActivity
             }
         });
 
+        /*
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -236,7 +243,54 @@ public class activity_gestione_ordini extends AppCompatActivity
                 // Another interface callback
             }
         });
+*/
 
+        filter = (SwitchMultiButton) findViewById(R.id.filter);
+        filter.setOnSwitchListener(new SwitchMultiButton.OnSwitchListener() {
+            @Override
+            public void onSwitch(int position, String tabText) {
+                System.out.println("asd");
+
+                String par;
+                switch (tabText)
+                {
+                    case "Richiesto":
+                        par = "idLocale=" + Restaurant.getId() + "&Stato=Richiesto";
+                        break;
+                    case "In Preparazione":
+                        par = "idLocale=" + Restaurant.getId() + "&Stato=In%20Preparazione";
+                        break;
+                    case "In Consegna":
+                        par = "idLocale=" + Restaurant.getId() + "&Stato=In%20Consegna";
+                        break;
+                    case "Consegnato":
+                        par = "idLocale=" + Restaurant.getId() + "&Stato=Consegnato";
+                        break;
+                    case "Tutto":
+                        par = "idLocale=" + Restaurant.getId() + "&Stato=all";
+                        break;
+                    default:
+                        par="";
+                }
+                showLoadingDialog();
+                new Thread(new Runnable() {
+                    public void run() {
+                        System.out.println(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
+                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
+                        fillOrderList(tmpJSON);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Stuff that updates the UI
+                                loadIntoOrderListView();
+                                pd.dismiss();
+                            }
+                        });
+                    }
+                }).start();
+
+            }
+        });
 
     }
     private void showLoadingDialog() {
@@ -247,26 +301,8 @@ public class activity_gestione_ordini extends AppCompatActivity
         pd.show();
     }
 
-    /*
-    private String downloadJSON(final String urlWebService) {
 
-        try {
-            URL url = new URL(urlWebService);
 
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString().trim();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-    */
 
     private void fillOrderList(String json) {
         try {
@@ -470,9 +506,7 @@ public class activity_gestione_ordini extends AppCompatActivity
                 }
             } else {
                 // Permission has already been granted
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                startActivity(callIntent);
+                callPhone(Restaurant.getNumeroTelefono());
             }
         }
         else if (id == R.id.nav_exit)
@@ -496,9 +530,7 @@ public class activity_gestione_ordini extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                    startActivity(callIntent);
+                    callPhone(Restaurant.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -525,6 +557,11 @@ public class activity_gestione_ordini extends AppCompatActivity
             // permissions this app might request.
         }
     }
-
+    public void callPhone(String Numero)
+    {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel: "+ Numero));
+        startActivity(callIntent);
+    }
 
 }

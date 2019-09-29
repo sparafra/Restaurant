@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
 
 
@@ -20,6 +21,8 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:networkSecurityConfig="@xml/network_security_config"
+
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activity.MainActivity"
@@ -71,6 +74,16 @@
             android:label="Registrati"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <receiver android:name=".service.background_alarm"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+
+            </intent-filter>
+        </receiver>
 
         <service android:name=".service.Background"/>
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCJWWoHpx4qlgenjXz77VxNAuWAvcw80aw"/>

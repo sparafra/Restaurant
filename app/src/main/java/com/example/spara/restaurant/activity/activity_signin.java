@@ -653,9 +653,8 @@ public class activity_signin extends AppCompatActivity
                 }
             } else {
                 // Permission has already been granted
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + Restaurant.getNumeroTelefono()));
-                startActivity(callIntent);
+                callPhone(Restaurant.getNumeroTelefono());
+
             }
         }
 
@@ -673,9 +672,7 @@ public class activity_signin extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                    startActivity(callIntent);
+                    callPhone(Restaurant.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -699,5 +696,12 @@ public class activity_signin extends AppCompatActivity
             // other 'case' lines to check for other
             // permissions this app might request.
         }
+    }
+
+    public void callPhone(String Numero)
+    {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel: "+ Numero));
+        startActivity(callIntent);
     }
 }

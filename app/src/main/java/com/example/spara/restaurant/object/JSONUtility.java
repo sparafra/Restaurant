@@ -1,10 +1,12 @@
 package com.example.spara.restaurant.object;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -19,21 +21,22 @@ public class JSONUtility {
 
     public static String downloadJSON(final String urlWebService) {
 
-        try {
-            URL url = new URL(urlWebService);
+                try {
+                    URL url = new URL(urlWebService);
 
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString().trim();
-        } catch (Exception e) {
-            return null;
-        }
+                    StringBuilder sb = new StringBuilder();
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String json;
+                    while ((json = bufferedReader.readLine()) != null) {
+                        sb.append(json + "\n");
+                    }
+                    return sb.toString().trim();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
     }
 
     public static List<User> fillUsers(String json)
@@ -326,4 +329,26 @@ public class JSONUtility {
         }catch (Exception e){e.printStackTrace(); return null;}
     }
 
+    public static ArrayList<Notice> fillNoticeList(String json)throws JSONException {
+
+        ArrayList<Notice> list = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray(json);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject obj = jsonArray.getJSONObject(i);
+
+            Notice N = new Notice();
+            N.setIdAvviso(obj.getInt("idAvviso"));
+            N.setCreatoDa(obj.getString("CreatoDa"));
+            N.setIdLocale(obj.getLong("idLocale"));
+            N.setMessaggio(obj.getString("Messaggio"));
+            N.setRicevutoDa(obj.getString("RicevutoDa"));
+            N.setTipo(obj.getString("Tipo"));
+            N.setTitolo(obj.getString("Titolo"));
+            N.setStato(obj.getBoolean("Stato"));
+
+            list.add(N);
+        }
+        return list;
+
+    }
 }

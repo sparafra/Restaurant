@@ -16,6 +16,7 @@ import com.example.spara.restaurant.object.Cart;
 import com.example.spara.restaurant.object.ChangeDeliveryDialogFragment;
 import com.example.spara.restaurant.object.Ingredient;
 import com.example.spara.restaurant.object.JSONUtility;
+import com.example.spara.restaurant.object.Notice;
 import com.example.spara.restaurant.object.Order;
 import com.example.spara.restaurant.object.Preference;
 import com.example.spara.restaurant.object.Product;
@@ -69,6 +70,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import lib.kingja.switchbutton.SwitchMultiButton;
+
 import static com.example.spara.restaurant.object.JSONUtility.*;
 
 public class activity_info_ordine extends AppCompatActivity
@@ -85,13 +88,15 @@ public class activity_info_ordine extends AppCompatActivity
 
     ListView listProducts;
 
-    Button changeStatus;
+    ImageView call;
     TextView Indirizzo;
     TextView Nominativo;
     TextView OrderId;
     TextView CostoTotale;
     LabeledSwitch Domicilio;
     ImageView deleteOrder;
+
+    SwitchMultiButton status;
 
     int posSelected = -1;
 
@@ -126,7 +131,7 @@ public class activity_info_ordine extends AppCompatActivity
 
         //MY CODE
 
-
+    /*
         Spinner spChangeStatus = (Spinner) findViewById(R.id.sp_change_status);
 // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapterChangeStatus = ArrayAdapter.createFromResource(this,
@@ -135,14 +140,16 @@ public class activity_info_ordine extends AppCompatActivity
         adapterChangeStatus.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
         spChangeStatus.setAdapter(adapterChangeStatus);
-
+    */
 
         //Background Image Declaration
         ImageView imgTransparent = findViewById(R.id.imageView);
         imgTransparent.setAlpha(230);
 
         //Status Image Button Declaration
-        changeStatus = findViewById(R.id.btn_change_status);
+        call = findViewById(R.id.call);
+        status = (SwitchMultiButton) findViewById(R.id.status);
+
         Indirizzo = findViewById(R.id.Indirizzo);
         Nominativo = findViewById(R.id.Nominativo);
         Domicilio = findViewById(R.id.swDomicilio);
@@ -167,6 +174,8 @@ public class activity_info_ordine extends AppCompatActivity
         }
         //Toast.makeText(getApplicationContext(), UserLogged.getNumeroTelefono(), Toast.LENGTH_SHORT).show();
 
+
+
         showLoadingDialog();
         new Thread(new Runnable() {
             public void run() {
@@ -190,19 +199,19 @@ public class activity_info_ordine extends AppCompatActivity
                         switch (O.getStato())
                         {
                             case "Richiesto":
-                                spChangeStatus.setSelection(0);
+                                status.setSelectedTab(0);
                                 break;
                             case "In Preparazione":
-                                spChangeStatus.setSelection(1);
+                                status.setSelectedTab(1);
                                 break;
                             case "In Consegna":
-                                spChangeStatus.setSelection(2);
+                                status.setSelectedTab(2);
                                 break;
                             case "Consegnato":
-                                spChangeStatus.setSelection(3);
+                                status.setSelectedTab(3);
                                 break;
                             case "Tutto":
-                                spChangeStatus.setSelection(4);
+                                status.setSelectedTab(4);
                                 break;
                         }
 
@@ -212,65 +221,15 @@ public class activity_info_ordine extends AppCompatActivity
             }
         }).start();
 
-        //ListView Click on Item Event
-        listProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        status.setOnSwitchListener(new SwitchMultiButton.OnSwitchListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                view.setSelected(true);
-
-            }
-        });
-        deleteOrder.setOnClickListener(new View.OnClickListener() {
-            //@Override
-            public void onClick(View v) {
-                System.out.println("Delete Order");
-
-                String par = "idOrdine="+O.getId();
-                InsertIntoDB(Connection.getURL(WebConnection.query.DELETEORDER, par));
-                Toast.makeText(getApplicationContext(), "Ordine cancellato", Toast.LENGTH_SHORT).show();
-
-                Intent I = new Intent(activity_info_ordine.this, activity_gestione_ordini.class);
-                I.putExtra("Cart", cartProducts);
-                I.putExtra("User", UserLogged);
-                I.putExtra("WebConnection" ,Connection);
-                startActivity(I);
-                activity_info_ordine.this.finish();
-            }
-        });
-        spChangeStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int pos, long id) {
-                // An item was selected. You can retrieve the selected item using
-                // parent.getItemAtPosition(pos)
-
-                //Toast.makeText(getApplicationContext(), parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
-
-            }
-
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Another interface callback
-            }
-        });
-
-        changeStatus.setOnClickListener(new View.OnClickListener() {
-            //@Override
-            public void onClick(View v) {
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Stuff that updates the UI
-                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                        animation1.setDuration(2000);
-                        v.startAnimation(animation1);                    }
-                });
+            public void onSwitch(int position, String tabText) {
 
                 showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
                         String status="";
-                        switch (spChangeStatus.getSelectedItem().toString())
+                        switch (tabText)
                         {
                             case "Richiesto":
                                 O.setStato("Richiesto");
@@ -321,6 +280,7 @@ public class activity_info_ordine extends AppCompatActivity
                                         Indirizzo.setText(U.getIndirizzo());
                                         OrderId.setText("Order ID: " + O.getId());
                                         CostoTotale.setText("Costo Totale: " + O.getTotaleCosto() + " €");
+                                        /*
                                         switch (O.getStato())
                                         {
                                             case "Richiesto":
@@ -339,7 +299,7 @@ public class activity_info_ordine extends AppCompatActivity
                                                 spChangeStatus.setSelection(4);
                                                 break;
                                         }
-
+                                           */
                                     }
                                 });
                                 pd.dismiss();
@@ -347,8 +307,101 @@ public class activity_info_ordine extends AppCompatActivity
                         }).start();
                     }
                 }).start();
+
             }
         });
+
+
+
+        //ListView Click on Item Event
+        listProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setSelected(true);
+
+            }
+        });
+        deleteOrder.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+                System.out.println("Delete Order");
+
+                String par = "idOrdine="+O.getId();
+                InsertIntoDB(Connection.getURL(WebConnection.query.DELETEORDER, par));
+                Toast.makeText(getApplicationContext(), "Ordine cancellato", Toast.LENGTH_SHORT).show();
+
+                Intent I = new Intent(activity_info_ordine.this, activity_gestione_ordini.class);
+                I.putExtra("Cart", cartProducts);
+                I.putExtra("User", UserLogged);
+                I.putExtra("WebConnection" ,Connection);
+                startActivity(I);
+                activity_info_ordine.this.finish();
+            }
+        });
+        /*
+        spChangeStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id) {
+                // An item was selected. You can retrieve the selected item using
+                // parent.getItemAtPosition(pos)
+
+                //Toast.makeText(getApplicationContext(), parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
+
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
+        */
+
+        call.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Stuff that updates the UI
+                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
+                        animation1.setDuration(2000);
+                        v.startAnimation(animation1);
+                    }
+                });
+
+                // Here, thisActivity is the current activity
+                if (ContextCompat.checkSelfPermission(activity_info_ordine.this,
+                        Manifest.permission.CALL_PHONE)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    // Permission is not granted
+                    // Should we show an explanation?
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(activity_info_ordine.this,
+                            Manifest.permission.CALL_PHONE)) {
+                        // Show an explanation to the user *asynchronously* -- don't block
+                        // this thread waiting for the user's response! After the user
+                        // sees the explanation, try again to request the permission.
+                    } else {
+                        // No explanation needed; request the permission
+                        ActivityCompat.requestPermissions(activity_info_ordine.this,
+                                new String[]{Manifest.permission.CALL_PHONE},
+                                1);
+
+                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                        // app-defined int constant. The callback method gets the
+                        // result of the request.
+                    }
+                } else {
+                    // Permission has already been granted
+                    System.out.println(U.getNumeroTelefono());
+                    callPhone(U.getNumeroTelefono());
+                }
+
+            }
+        });
+
+
         OnToggledListener x = new OnToggledListener() {
             @Override
             public void onSwitched(ToggleableView toggleableView, boolean isOn) {
@@ -357,6 +410,10 @@ public class activity_info_ordine extends AppCompatActivity
             }
         };
         Domicilio.setOnToggledListener(x);
+
+
+
+
     }
     private void showLoadingDialog() {
         pd = new ProgressDialog(this, R.style.DialogTheme);
@@ -388,6 +445,26 @@ public class activity_info_ordine extends AppCompatActivity
 
                     String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr + "&Costo=" + O.getTotaleCosto();
                     InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
+
+                    //CREATE NOTICE FOR CLIENT TO ADVISE OF CHANGE
+
+                    Notice N = new Notice();
+                    N.setStato(false);
+                    N.setRicevutoDa(O.getNumeroTelefono());
+                    N.setTitolo("Ordine " + O.getId());
+                    if(!O.getAsporto())
+                        N.setMessaggio("Cambiato da Domicilio a Asporto");
+                    else
+                        N.setMessaggio("Cambiato da Asporto a Domicilio");
+
+                    N.setIdLocale(Restaurant.getId());
+                    N.setCreatoDa(UserLogged.getNumeroTelefono());
+                    N.setTipo("normal");
+
+                    par = "Stato=" + N.getStato() + "&CreatoDa=" + N.getCreatoDa() + "&Messaggio=" + N.getMessaggio().replaceAll(" ", "%20") + "&idLocale=" + N.getIdLocale() +"&RicevutoDa=" + N.getRicevutoDa() + "&Tipo=" + N.getTipo() + "&Titolo=" + N.getTitolo().replaceAll(" ", "%20") ;
+                    InsertIntoDB(Connection.getURL(WebConnection.query.INSERTNOTICE, par));
+
+
                     pd.dismiss();
 
                 }
@@ -676,9 +753,7 @@ public class activity_info_ordine extends AppCompatActivity
                 }
             } else {
                 // Permission has already been granted
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+ Restaurant.getNumeroTelefono()));
-                startActivity(callIntent);
+                callPhone(Restaurant.getNumeroTelefono());
             }
         }
         else if (id == R.id.nav_exit)
@@ -702,9 +777,7 @@ public class activity_info_ordine extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                    startActivity(callIntent);
+                    callPhone(Restaurant.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -730,6 +803,13 @@ public class activity_info_ordine extends AppCompatActivity
             // other 'case' lines to check for other
             // permissions this app might request.
         }
+    }
+
+    public void callPhone(String Numero)
+    {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel: "+ Numero));
+        startActivity(callIntent);
     }
 
     /*

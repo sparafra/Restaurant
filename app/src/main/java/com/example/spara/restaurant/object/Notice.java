@@ -8,6 +8,8 @@ public class Notice {
     String RicevutoDa;
     String Messaggio;
     Long idLocale;
+    String Tipo;
+    String Titolo;
 
     public Notice(){}
 
@@ -46,5 +48,21 @@ public class Notice {
     }
     public void setIdLocale(Long idLocale) {
         this.idLocale = idLocale;
+    }
+
+    public String getTipo() {
+        return Tipo;
+    }
+
+    public void setTipo(String tipo) {
+        Tipo = tipo;
+    }
+
+    public String getTitolo() {
+        return Titolo;
+    }
+
+    public void setTitolo(String titolo) {
+        Titolo = titolo;
     }
 }

@@ -278,8 +278,10 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                                     N.setMessaggio("Ricevuto nuovo ordine con id: " + O.getId());
                                     N.setIdLocale(Restaurant.getId());
                                     N.setCreatoDa(O.getNumeroTelefono());
+                                    N.setTitolo("Nuovo Ordine");
+                                    N.setTipo("new_order");
 
-                                    par = "Stato=" + N.getStato() + "&CreatoDa=" + N.getCreatoDa() + "&Messaggio=" + N.getMessaggio().replaceAll(" ", "%20") + "&idLocale=" + N.getIdLocale() +"&RicevutoDa=" + N.getRicevutoDa();
+                                    par = "Stato=" + N.getStato() + "&CreatoDa=" + N.getCreatoDa() + "&Messaggio=" + N.getMessaggio().replaceAll(" ", "%20") + "&idLocale=" + N.getIdLocale() +"&RicevutoDa=" + N.getRicevutoDa() + "&Tipo=" + N.getTipo() + "&Titolo=" + N.getTitolo().replaceAll(" ", "%20");
                                     InsertIntoDB(Connection.getURL(WebConnection.query.INSERTNOTICE, par));
 
                                 }
@@ -630,9 +632,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                 }
             } else {
                 // Permission has already been granted
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                startActivity(callIntent);
+                callPhone(Restaurant.getNumeroTelefono());
+
             }
         }
         else if (id == R.id.nav_exit)
@@ -656,9 +657,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                    startActivity(callIntent);
+                    callPhone(Restaurant.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -684,6 +683,13 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             // other 'case' lines to check for other
             // permissions this app might request.
         }
+    }
+
+    public void callPhone(String Numero)
+    {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel: "+ Numero));
+        startActivity(callIntent);
     }
 
     /*

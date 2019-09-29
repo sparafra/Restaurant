@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 
@@ -34,6 +37,7 @@ import com.example.spara.restaurant.object.Restaurant;
 import com.example.spara.restaurant.object.ReviewProduct;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
+import com.example.spara.restaurant.service.background_alarm;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.app.ActivityCompat;
@@ -68,6 +72,10 @@ public class activity_home extends AppCompatActivity
     //CALL - 1
     //INTERNET -2
 
+    Long TimeToAlarm = Long.valueOf(60000); //1 minutes
+
+    public static final int REQUEST_CODE=101;
+
     ListView list;
 
     ArrayList<Product> listProducts;
@@ -78,6 +86,8 @@ public class activity_home extends AppCompatActivity
     WebConnection Connection;
     ProgressDialog pd;
 
+    AlarmManager alarmManager;
+    PendingIntent pendingIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,10 +169,47 @@ public class activity_home extends AppCompatActivity
         ImageView btnAddCart = findViewById(R.id.addCart);
 
         //Starting background service
+
+        /*
         Intent I1 = new Intent(activity_home.this, Background.class);
         I1.putExtra("UserNumber", UserLogged.getNumeroTelefono());
         //I.putExtra("WebConnection" ,Connection);
-        startService(I1);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            startForegroundService(I1);
+        else
+            startService(I1);
+
+         */
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(this, background_alarm.class);
+        intent.putExtra("UserNumber", UserLogged.getNumeroTelefono());
+
+        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        /*
+        Alarm will be triggered approximately after one hour and will be repeated every hour after that
+        */
+        //Long intervalMillis = 1L * 60L * 1000L;
+        //Long triggerAtMillis = System.currentTimeMillis() + intervalMillis;
+        //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);
+        System.out.println("Start");
+        startAlarm();
+        /*
+        1st Param : Type of the Alarm
+
+        2nd Param : Time in milliseconds when the alarm will be triggered first
+
+        3rd Param : Interval after which alarm will be repeated . You can only use any one of the AlarmManager constants
+
+        4th Param :Pending Intent
+
+        */
+
+
+
 
         //User Confirm Control
         if(!UserLogged.getConfermato())
@@ -669,9 +716,8 @@ public class activity_home extends AppCompatActivity
                 }
             } else {
                 // Permission has already been granted
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:"+ Restaurant.getNumeroTelefono()));
-                startActivity(callIntent);
+                callPhone(Restaurant.getNumeroTelefono());
+
             }
 
         }
@@ -696,9 +742,7 @@ public class activity_home extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                    callIntent.setData(Uri.parse("tel:"+Restaurant.getNumeroTelefono()));
-                    startActivity(callIntent);
+                    callPhone(Restaurant.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -726,6 +770,12 @@ public class activity_home extends AppCompatActivity
         }
     }
 
+    public void callPhone(String Numero)
+    {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel: "+ Numero));
+        startActivity(callIntent);
+    }
     /*
     private void savePreferences(String NumeroTelefono, String Mail, String Password) {
         SharedPreferences settings = getSharedPreferences("alPachino",
@@ -739,4 +789,23 @@ public class activity_home extends AppCompatActivity
         editor.commit();
     }
      */
+
+    private void startAlarm() {
+
+        Long intervalMillis = 5L * 60L * 1000L;
+        Long triggerAtMillis = System.currentTimeMillis() + intervalMillis;
+        //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);
+        /*
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, 0, pendingIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, 0, pendingIntent);
+        } else {
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);
+        }*/
+        //Toast.makeText(getApplicationContext(), "Alarm", Toast.LENGTH_LONG).show();
+
+
+    }
 }

@@ -20,15 +20,7 @@
         app:srcCompat="@color/colorPrimaryDark"
         tools:srcCompat="@color/TransparentColor" />
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintBottom_toTopOf="@id/listOrdini"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toTopOf="parent" />
+
     <ListView
         android:id="@+id/listOrdini"
         android:layout_width="match_parent"
@@ -38,19 +30,27 @@
         android:layout_marginEnd="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner" />
+        app:layout_constraintTop_toBottomOf="@+id/filter" />
 
-    <TextView
-        android:id="@+id/textView2"
+
+
+    <lib.kingja.switchbutton.SwitchMultiButton
+        android:id="@+id/filter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Filtra gli ordini per: "
-        android:textColor="#ffff"
-        android:textSize="15dp"
+        android:layout_marginTop="8dp"
+        android:padding="8dp"
         app:layout_constraintBottom_toTopOf="@+id/listOrdini"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:selectedColor="#64B5F6"
+        app:selectedTab="0"
+        app:strokeRadius="5dp"
+        app:strokeWidth="1dp"
+        app:switchTabs="@array/order_filter_array"
+        app:textSize="10sp" />
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
