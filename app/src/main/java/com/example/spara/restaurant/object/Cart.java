@@ -26,7 +26,7 @@ public class Cart implements Parcelable {
 
         for(int k=0; k<listProducts.size(); k++)
         {
-            Total += listProducts.get(k).getPrezzo();
+            Total += listProducts.get(k).getPrezzo() * listProducts.get(k).getQuantity();
         }
 
         return Total;

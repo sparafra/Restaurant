@@ -177,49 +177,7 @@ public class activity_info_ordine extends AppCompatActivity
 
 
         showLoadingDialog();
-        new Thread(new Runnable() {
-            public void run() {
-                String par = "idOrdine=" + idOrdine;
-                String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDER, par));
-                O = fillOrder(tmpJSON);
-                par = "NumeroTelefono=" + O.getNumeroTelefono() ;
-                tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
-                U = fillUser(tmpJSON);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Stuff that updates the UI
-                        loadIntoProductListView(O.getListProducts());
-                        Domicilio.setOn(O.getAsporto());
-
-                        Nominativo.setText(U.getNome() + " " + U.getCognome());
-                        Indirizzo.setText(U.getIndirizzo());
-                        OrderId.setText("Order ID: " + O.getId());
-                        CostoTotale.setText("Costo Totale: " + O.getTotaleCosto() + " €");
-                        switch (O.getStato())
-                        {
-                            case "Richiesto":
-                                status.setSelectedTab(0);
-                                break;
-                            case "In Preparazione":
-                                status.setSelectedTab(1);
-                                break;
-                            case "In Consegna":
-                                status.setSelectedTab(2);
-                                break;
-                            case "Consegnato":
-                                status.setSelectedTab(3);
-                                break;
-                            case "Tutto":
-                                status.setSelectedTab(4);
-                                break;
-                        }
-
-                    }
-                });
-                pd.dismiss();
-            }
-        }).start();
+        refreshInfoOrder(idOrdine);
 
         status.setOnSwitchListener(new SwitchMultiButton.OnSwitchListener() {
             @Override
@@ -415,6 +373,55 @@ public class activity_info_ordine extends AppCompatActivity
 
 
     }
+
+    private void refreshInfoOrder(int idOrdine)
+    {
+        new Thread(new Runnable() {
+            public void run() {
+                String par = "idOrdine=" + idOrdine;
+                String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDER, par));
+                O = fillOrder(tmpJSON);
+                par = "NumeroTelefono=" + O.getNumeroTelefono() ;
+                tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
+                U = fillUser(tmpJSON);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Stuff that updates the UI
+                        loadIntoProductListView(O.getListProducts());
+                        Domicilio.setOn(O.getAsporto());
+
+                        Nominativo.setText(U.getNome() + " " + U.getCognome());
+                        Indirizzo.setText(U.getIndirizzo());
+                        OrderId.setText("Order ID: " + O.getId());
+                        CostoTotale.setText("Costo Totale: " + String.valueOf(O.getTotaleCosto()) + " €");
+                        System.out.println(O.getTotaleCosto());
+                        switch (O.getStato())
+                        {
+                            case "Richiesto":
+                                status.setSelectedTab(0);
+                                break;
+                            case "In Preparazione":
+                                status.setSelectedTab(1);
+                                break;
+                            case "In Consegna":
+                                status.setSelectedTab(2);
+                                break;
+                            case "Consegnato":
+                                status.setSelectedTab(3);
+                                break;
+                            case "Tutto":
+                                status.setSelectedTab(4);
+                                break;
+                        }
+
+                    }
+                });
+                pd.dismiss();
+            }
+        }).start();
+    }
+
     private void showLoadingDialog() {
         pd = new ProgressDialog(this, R.style.DialogTheme);
         pd.setTitle("Loading...");
@@ -442,9 +449,16 @@ public class activity_info_ordine extends AppCompatActivity
                     String timeStr = time.format(O.getDateTime());
 
                     O.setAsporto(Domicilio.isOn());
+                    if(!O.getAsporto())
+                        O.setCosto(O.getTotaleCosto() - 1);
+                    else
+                        O.setCosto(O.getTotaleCosto() + 1);
+
 
                     String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr + "&Costo=" + O.getTotaleCosto();
                     InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
+
+                    refreshInfoOrder(O.getId());
 
                     //CREATE NOTICE FOR CLIENT TO ADVISE OF CHANGE
 

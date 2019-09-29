@@ -258,7 +258,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                     String dateStr = date.format(currentTime);
                     String timeStr = time.format(currentTime);
                     O.setDateTime(currentTime);
-
+                    O.setCosto(cartProducts.getTotalCost());
+                    System.out.println("CART COSTO: " + cartProducts.getTotalCost());
                     try {
                         showLoadingDialog();
                         new Thread(new Runnable() {
@@ -330,10 +331,15 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         if(inputText.equals("Si"))
         {
             O.setAsporto(true);
+            O.setCosto(O.getTotaleCosto() + 1);
             SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
             SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
             String dateStr = date.format(O.getDateTime());
             String timeStr = time.format(O.getDateTime());
+            System.out.println("UPDATE");
+
+            System.out.println(O.getTotaleCosto());
+
             String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() + "&Costo=" + O.getTotaleCosto() +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr;
 
             new Thread(new Runnable() {

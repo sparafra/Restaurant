@@ -192,6 +192,7 @@ public class JSONUtility {
                 O.setAsporto(true);
             }
             O.setNumeroTelefono(obj.getString("NumeroTelefono"));
+            O.setCosto(Float.parseFloat(obj.getString("Costo")));
 
             SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
             SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
@@ -259,6 +260,7 @@ public class JSONUtility {
                     O.setAsporto(true);
                 }
                 O.setNumeroTelefono(obj.getString("NumeroTelefono"));
+                O.setCosto(Float.parseFloat(obj.getString("Costo")));
 
                 SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
                 SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);

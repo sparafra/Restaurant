@@ -76,18 +76,18 @@ public class Order {
             float Tot=0;
             for(int k=0; k<listProducts.size(); k++)
             {
-                Tot += listProducts.get(k).getPrezzo()*listProducts.get(k).getQuantity();
+                Tot = Tot + (listProducts.get(k).getPrezzo()*listProducts.get(k).getQuantity());
             }
+            /*
             if(Asporto)
                 return  Tot+1;
             else
                 return Tot;
+             */
+            return Tot;
         }
         else {
-            if(Asporto)
-                return  Costo+1;
-            else
-                return Costo;
+            return Costo;
         }
 
     }
