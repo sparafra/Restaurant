@@ -22,6 +22,7 @@ import com.example.spara.restaurant.object.Preference;
 import com.example.spara.restaurant.object.Product;
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.example.spara.restaurant.custom_adapter.customAdapter_info_ordine;
@@ -131,16 +132,6 @@ public class activity_info_ordine extends AppCompatActivity
 
         //MY CODE
 
-    /*
-        Spinner spChangeStatus = (Spinner) findViewById(R.id.sp_change_status);
-// Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapterChangeStatus = ArrayAdapter.createFromResource(this,
-                R.array.order_filter_array, R.layout.row);
-// Specify the layout to use when the list of choices appears
-        adapterChangeStatus.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spChangeStatus.setAdapter(adapterChangeStatus);
-    */
 
         //Background Image Declaration
         ImageView imgTransparent = findViewById(R.id.imageView);
@@ -162,14 +153,20 @@ public class activity_info_ordine extends AppCompatActivity
 
 
         //Get INTENT Extra
+        if(Setting.getDebug())
+            System.out.println("INITIALIZE PREFERENCES");
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
         UserLogged = (User) getIntent().getParcelableExtra("User");
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
         int idOrdine = getIntent().getIntExtra("idOrdine", -1);
-        System.out.println(idOrdine);
+
+        if(Setting.getDebug())
+            System.out.println("ORDER ID: " + idOrdine);
 
         if(UserLogged.getAmministratore())
         {
+            if(Setting.getDebug())
+                System.out.println("SETTING THE ADDITIONAL PANEL FOR ADMIN");
             navigationView.getMenu().findItem(R.id.nav_gestione_ordini).setVisible(true);
         }
         //Toast.makeText(getApplicationContext(), UserLogged.getNumeroTelefono(), Toast.LENGTH_SHORT).show();
@@ -182,6 +179,9 @@ public class activity_info_ordine extends AppCompatActivity
         status.setOnSwitchListener(new SwitchMultiButton.OnSwitchListener() {
             @Override
             public void onSwitch(int position, String tabText) {
+
+                if(Setting.getDebug())
+                    System.out.println("CHANGING STATUS ORDER");
 
                 showLoadingDialog();
                 new Thread(new Runnable() {
@@ -210,57 +210,16 @@ public class activity_info_ordine extends AppCompatActivity
                         }
 
 
-                        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-                        SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
-                        String dateStr = date.format(O.getDateTime());
-                        String timeStr = time.format(O.getDateTime());
+                        SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
+                        String date_time = datetime.format(O.getDateTime());
 
-                        String par = "idOrdine=" + O.getId() + "&Stato=" + status + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr + "&Costo=" + O.getTotaleCosto();
+                        String par = "idOrdine=" + O.getId() + "&Stato=" + status + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + date_time.replaceAll(" ", "%20") + "&Costo=" + O.getTotaleCosto();
 
                         new Thread(new Runnable() {
                             public void run() {
                                 InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
 
-                                String par = "idOrdine=" + idOrdine;
-                                String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDER, par));
-                                O = fillOrder(tmpJSON);
-                                par = "NumeroTelefono=" + O.getNumeroTelefono();
-                                System.out.println(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
-                                tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
-                                U = fillUser(tmpJSON);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Stuff that updates the UI
-                                        loadIntoProductListView(O.getListProducts());
-                                        Domicilio.setOn(O.getAsporto());
-                                        Nominativo.setText(U.getNome() + " " + U.getCognome());
-                                        Indirizzo.setText(U.getIndirizzo());
-                                        OrderId.setText("Order ID: " + O.getId());
-                                        CostoTotale.setText("Costo Totale: " + O.getTotaleCosto() + " €");
-                                        /*
-                                        switch (O.getStato())
-                                        {
-                                            case "Richiesto":
-                                                spChangeStatus.setSelection(0);
-                                                break;
-                                            case "In Preparazione":
-                                                spChangeStatus.setSelection(1);
-                                                break;
-                                            case "In Consegna":
-                                                spChangeStatus.setSelection(2);
-                                                break;
-                                            case "Consegnato":
-                                                spChangeStatus.setSelection(3);
-                                                break;
-                                            case "Tutto":
-                                                spChangeStatus.setSelection(4);
-                                                break;
-                                        }
-                                           */
-                                    }
-                                });
-                                pd.dismiss();
+                                refreshInfoOrder(O.getId());
                             }
                         }).start();
                     }
@@ -282,7 +241,8 @@ public class activity_info_ordine extends AppCompatActivity
         deleteOrder.setOnClickListener(new View.OnClickListener() {
             //@Override
             public void onClick(View v) {
-                System.out.println("Delete Order");
+                if(Setting.getDebug())
+                    System.out.println("DELETE ORDER");
 
                 String par = "idOrdine="+O.getId();
                 InsertIntoDB(Connection.getURL(WebConnection.query.DELETEORDER, par));
@@ -296,23 +256,7 @@ public class activity_info_ordine extends AppCompatActivity
                 activity_info_ordine.this.finish();
             }
         });
-        /*
-        spChangeStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int pos, long id) {
-                // An item was selected. You can retrieve the selected item using
-                // parent.getItemAtPosition(pos)
 
-                //Toast.makeText(getApplicationContext(), parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
-
-            }
-
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Another interface callback
-            }
-        });
-        */
 
         call.setOnClickListener(new View.OnClickListener() {
             //@Override
@@ -352,7 +296,9 @@ public class activity_info_ordine extends AppCompatActivity
                     }
                 } else {
                     // Permission has already been granted
-                    System.out.println(U.getNumeroTelefono());
+                    if(Setting.getDebug())
+                        System.out.println("CALL TO: " + U.getNumeroTelefono());
+
                     callPhone(U.getNumeroTelefono());
                 }
 
@@ -363,7 +309,8 @@ public class activity_info_ordine extends AppCompatActivity
         OnToggledListener x = new OnToggledListener() {
             @Override
             public void onSwitched(ToggleableView toggleableView, boolean isOn) {
-                System.out.println("EVENT");
+                if(Setting.getDebug())
+                    System.out.println("SWITCH EVENT");
                 showAlertDialog();
             }
         };
@@ -378,6 +325,9 @@ public class activity_info_ordine extends AppCompatActivity
     {
         new Thread(new Runnable() {
             public void run() {
+                if(Setting.getDebug())
+                    System.out.println("REFRESH INFO");
+
                 String par = "idOrdine=" + idOrdine;
                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDER, par));
                 O = fillOrder(tmpJSON);
@@ -436,17 +386,17 @@ public class activity_info_ordine extends AppCompatActivity
     }
     @Override
     public void onFinishEditDialog(String inputText) {
-        //Toast.makeText(this, "Hi, " + inputText, Toast.LENGTH_SHORT).show();
+
         if(inputText.equals("Si"))
         {
-            System.out.println("Si");
+            if(Setting.getDebug())
+                System.out.println("CHANGING DOMICILIO OF ORDER " + O.getId());
+
             new Thread(new Runnable() {
                 public void run() {
 
-                    SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-                    SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
-                    String dateStr = date.format(O.getDateTime());
-                    String timeStr = time.format(O.getDateTime());
+                    SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
+                    String date_time = datetime.format(O.getDateTime());
 
                     O.setAsporto(Domicilio.isOn());
                     if(!O.getAsporto())
@@ -455,12 +405,14 @@ public class activity_info_ordine extends AppCompatActivity
                         O.setCosto(O.getTotaleCosto() + 1);
 
 
-                    String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr + "&Costo=" + O.getTotaleCosto();
+                    String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + date_time.replaceAll(" ", "%20") + "&Costo=" + O.getTotaleCosto();
                     InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
 
                     refreshInfoOrder(O.getId());
 
                     //CREATE NOTICE FOR CLIENT TO ADVISE OF CHANGE
+                    if(Setting.getDebug())
+                        System.out.println("INITIALIZE NOTICE FOR CLIENT");
 
                     Notice N = new Notice();
                     N.setStato(false);
@@ -490,10 +442,11 @@ public class activity_info_ordine extends AppCompatActivity
         }
 
     }
+
+
     public void InsertIntoDB(final String urlWebService) {
 
         try {
-
             URL url = new URL(urlWebService);
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -512,120 +465,18 @@ public class activity_info_ordine extends AppCompatActivity
         }
     }
 
-    /*
-    private String downloadJSON(final String urlWebService) {
 
-        try {
-            URL url = new URL(urlWebService);
 
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString().trim();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-*/
     public Order getOrder(){return O;}
     public WebConnection getConnection(){return Connection;}
 
-    /*
-    private void fillOrder(String json) {
 
-        try {
-            O = new Order();
-            //JSONArray jsonArray = new JSONArray(json);
-            JSONObject obj = new JSONObject(json);
-
-            O.setId(obj.getInt("idOrdine"));
-            O.setStato(obj.getString("Stato"));
-            if (obj.getBoolean("Asporto") == false) {
-                O.setAsporto(false);
-            } else {
-                O.setAsporto(true);
-            }
-            O.setNumeroTelefono(obj.getString("NumeroTelefono"));
-
-            SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
-            SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-            Date d1 = null;
-            try {
-                d1 = sdf3.parse(obj.getString("DataOra"));
-            } catch (Exception e) {
-                d1 = sdf4.parse(obj.getString("DataOra"));
-            }
-
-            O.setDateTime(d1);
-            O.setCosto(Float.valueOf(obj.getString("Costo")));
-            JSONArray products = obj.getJSONArray("Products");
-
-            List<Product> listProductsOrder = new ArrayList<>();
-            for (int k = 0; k < products.length(); k++) {
-                JSONObject product = products.getJSONObject(k);
-
-                System.out.println(products.toString());
-                Product P = new Product();
-                P.setId(product.getInt("idProdotto"));
-                P.setPrezzo(Float.parseFloat(product.getString("Price")));
-                P.setImageURL(product.getString("ImageURL"));
-                P.setTipo(product.getString("Type"));
-                P.setNome(product.getString("Name"));
-                P.setQuantity(product.getInt("Quantity"));
-
-                JSONArray ingredients = product.getJSONArray("Ingredients");
-                List<Ingredient> listIngredient = new ArrayList<>();
-                for (int j = 0; j < ingredients.length(); j++) {
-                    JSONObject ingredient = ingredients.getJSONObject(j);
-
-                    Ingredient I = new Ingredient();
-                    I.setId(Integer.parseInt(ingredient.getString("idIngredient")));
-                    I.setNome(ingredient.getString("Name"));
-                    I.setPrezzo(Float.parseFloat(ingredient.getString("Price")));
-                    listIngredient.add(I);
-
-                }
-                P.setListIngredienti(listIngredient);
-                listProductsOrder.add(P);
-            }
-
-            O.setListProducts(listProductsOrder);
-
-
-        }catch (Exception e){e.printStackTrace();}
-    }
-    */
-
-    /*
-    private void fillUser(String json) {
-
-        try {
-            U = new User();
-
-            JSONObject obj = new JSONObject(json);
-
-            U.setNumeroTelefono(obj.getString("NumeroTelefono"));
-            U.setMail(obj.getString("Mail"));
-            U.setPassword(obj.getString("Password"));
-            U.setNome(obj.getString("Nome"));
-            U.setCognome(obj.getString("Cognome"));
-            U.setIndirizzo(obj.getString("Indirizzo"));
-            U.setAmministratore(obj.getBoolean("Amministratore"));
-            U.setConfermato(obj.getBoolean("Confermato"));
-            U.setIdLocale(obj.getLong("idLocale"));
-
-
-        }catch (Exception e){e.printStackTrace();}
-    }
-
-     */
     private void loadIntoProductListView(List<Product> listP)
     {
+        if(Setting.getDebug())
+            System.out.println("LOAD INTO LISTVIEW");
+
         List<HashMap<String, String>> listitems = new ArrayList<>();
         customAdapter_info_ordine adapter = new customAdapter_info_ordine(this, listitems, R.layout.list_item__with_2_icon, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2}, listP);
 
@@ -826,17 +677,4 @@ public class activity_info_ordine extends AppCompatActivity
         startActivity(callIntent);
     }
 
-    /*
-    private void savePreferences(String NumeroTelefono, String Mail, String Password) {
-        SharedPreferences settings = getSharedPreferences("alPachino",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-
-        // Edit and commit
-        editor.putString("NumeroTelefono", NumeroTelefono);
-        editor.putString("Mail", Mail);
-        editor.putString("Password", Password);
-        editor.commit();
-    }
-    */
 }

@@ -82,9 +82,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TelephonyManager telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        telephonyManager.listen(new Listener(),PhoneStateListener.LISTEN_CALL_STATE);
-
 
         /* //Mail Floating Action
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -199,23 +196,6 @@ public class MainActivity extends AppCompatActivity
                                 if(Setting.getDebug())
                                     System.out.println("USER LOGGED: " + UserLogged.getNumeroTelefono() + ", NOMINATIVO= " + UserLogged.getCognome() + ", " + UserLogged.getNome());
 
-
-                                /*
-                                UserLogged = new User();
-
-                                UserLogged.setMail(obj.getString("Mail"));
-                                UserLogged.setCognome(obj.getString("Cognome"));
-                                UserLogged.setPassword(obj.getString("Password"));
-                                UserLogged.setNome(obj.getString("Nome"));
-                                UserLogged.setIndirizzo(obj.getString("Indirizzo"));
-                                UserLogged.setNumeroTelefono(obj.getString("NumeroTelefono"));
-                                UserLogged.setConfermato(obj.getBoolean("Confermato"));
-                                UserLogged.setAmministratore(obj.getBoolean("Amministratore"));
-
-                                UserLogged.setIdLocale(obj.getLong("idLocale"));
-                                UserLogged.setDisabilitato(obj.getBoolean("Disabilitato"));
-
-                                 */
                                 if(Setting.getDebug()) {
                                     if(UserLogged.getPassword().equals(txtPassword.getText().toString()))
                                         System.out.println("PASSWORD MATCHED");
@@ -227,7 +207,7 @@ public class MainActivity extends AppCompatActivity
                                 }
 
 
-                                if(UserLogged.getPassword().equals(txtPassword.getText().toString().trim()) && UserLogged.getConfermato() == true && UserLogged.getDisabilitato() == false) {
+                                if(UserLogged.getPassword().equals(password.trim()) && UserLogged.getConfermato() == true && UserLogged.getDisabilitato() == false) {
 
                                     Preference.savePreferences(UserLogged.getNumeroTelefono(), UserLogged.getMail(), UserLogged.getPassword(), MainActivity.this);
                                     cartProducts = new Cart();
@@ -257,7 +237,7 @@ public class MainActivity extends AppCompatActivity
                                             Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
                                             animation1.setDuration(1000);
                                             v.startAnimation(animation1);
-                                            if(!UserLogged.getPassword().equals(txtPassword.getText().toString().trim())) {
+                                            if(!UserLogged.getPassword().equals(password.trim())) {
                                                 Toast.makeText(getApplicationContext(), "Mail e/o Password non corretta", Toast.LENGTH_SHORT).show();
                                             }
                                             else if(!UserLogged.getConfermato())
@@ -394,42 +374,6 @@ public class MainActivity extends AppCompatActivity
                         if (jsonArray.length() > 0) {
                             JSONObject obj = jsonArray.getJSONObject(0);
                             UserLogged = fillUser(obj.toString());
-
-                            /*
-                            UserLogged = new User();
-                            UserLogged.setMail(obj.getString("Mail"));
-                            UserLogged.setCognome(obj.getString("Cognome"));
-                            UserLogged.setPassword(obj.getString("Password"));
-                            UserLogged.setNome(obj.getString("Nome"));
-                            UserLogged.setIndirizzo(obj.getString("Indirizzo"));
-                            UserLogged.setNumeroTelefono(obj.getString("NumeroTelefono"));
-
-
-
-                            System.out.println("Confermato: " + obj.getString("Confermato"));
-                            if(obj.getString("Confermato").equals("0"))
-                            {
-                                UserLogged.setConfermato(false);
-                            }
-                            else{
-                                UserLogged.setConfermato(true);
-                            }
-                            if(obj.getString("Amministratore").equals("0"))
-                            {
-                                UserLogged.setAmministratore(false);
-                            }
-                            else {
-                                UserLogged.setAmministratore(true);
-                            }
-                            UserLogged.setIdLocale(obj.getLong("idLocale"));
-                            if (obj.getString("Disabilitato").equals("0")) {
-                                UserLogged.setDisabilitato(false);
-
-                            } else {
-                                UserLogged.setDisabilitato(true);
-                            }
-
-                             */
 
                             cartProducts = new Cart();
                             Intent I = new Intent(MainActivity.this, activity_home.class);
@@ -603,21 +547,7 @@ public class MainActivity extends AppCompatActivity
             // permissions this app might request.
         }
     }
-    private class Listener extends PhoneStateListener
-    {
-        @Override
-        public void onCallStateChanged(int state, String incomingNumber)
-        {
-            switch (state)
-            {
-                case TelephonyManager.CALL_STATE_OFFHOOK:
-                    Log.i("CHIAMATA IN USCITA",   "TERMINALE IMPEGNATO");
-                    break;
-                case TelephonyManager.CALL_STATE_IDLE:
-                    Log.i("CHIAMATA IN USCITA",   "IDLE");
-            }
-        }
-    }
+
 
     public void callPhone(String Numero)
     {

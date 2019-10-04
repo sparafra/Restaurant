@@ -15,6 +15,7 @@ import com.example.spara.restaurant.object.Order;
 import com.example.spara.restaurant.object.Product;
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
@@ -51,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.spara.restaurant.object.JSONUtility.downloadJSON;
 import static com.example.spara.restaurant.object.JSONUtility.fillOrderList;
 import static com.example.spara.restaurant.object.Preference.savePreferences;
 
@@ -113,6 +115,9 @@ public class activity_ordini extends AppCompatActivity
         listProducts = (ListView) findViewById(R.id.listProdotti);
 
         //Get INTENT Extra
+        if(Setting.getDebug())
+            System.out.println("INITIALIZE PREFERENCES");
+
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
         UserLogged = (User) getIntent().getParcelableExtra("User");
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
@@ -120,16 +125,16 @@ public class activity_ordini extends AppCompatActivity
 
         if(UserLogged.getAmministratore())
         {
+            if(Setting.getDebug())
+                System.out.println("SETTING THE ADDITIONAL PANEL FOR ADMIN");
             navigationView.getMenu().findItem(R.id.nav_gestione_ordini).setVisible(true);
         }
-        //Toast.makeText(getApplicationContext(), UserLogged.getNumeroTelefono(), Toast.LENGTH_SHORT).show();
 
-        String par = "NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale="+UserLogged.getIdLocale();
+        String par = "NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale=" + UserLogged.getIdLocale();
         showLoadingDialog();
         new Thread(new Runnable() {
             public void run() {
                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSER, par));
-                System.out.println(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSER, par));
                 OrderList = fillOrderList(tmpJSON);
                 runOnUiThread(new Runnable() {
 
@@ -167,7 +172,6 @@ public class activity_ordini extends AppCompatActivity
                                 view.startAnimation(animation1);
                             }
                         });
-
                     }
                 }).start();
 
@@ -186,7 +190,6 @@ public class activity_ordini extends AppCompatActivity
                         view.startAnimation(animation1);
                     }
                 });
-                //posSelected = position;
             }
         });
 
@@ -199,98 +202,12 @@ public class activity_ordini extends AppCompatActivity
         pd.show();
     }
 
-    private String downloadJSON(final String urlWebService) {
-
-        try {
-            URL url = new URL(urlWebService);
-
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString().trim();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /*
-    private void fillOrderList(String json) {
-        try {
-            OrderList = new ArrayList<>();
-            JSONArray jsonArray = new JSONArray(json);
-            System.out.println(jsonArray.toString());
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                System.out.println(obj.toString());
-
-                Order O = new Order();
-                O.setId(obj.getInt("idOrdine"));
-                O.setStato(obj.getString("Stato"));
-                if (obj.getBoolean("Asporto") == false) {
-                    O.setAsporto(false);
-                } else {
-                    O.setAsporto(true);
-                }
-                O.setNumeroTelefono(obj.getString("NumeroTelefono"));
-
-                SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
-                SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-                Date d1 = null;
-                try {
-                    d1 = sdf3.parse(obj.getString("DataOra"));
-                } catch (Exception e) {
-                    d1 = sdf4.parse(obj.getString("DataOra"));
-                }
-                O.setDateTime(d1);
-                System.out.println(O.getDateTime());
-                System.out.println(obj.getString("DataOra"));
-                JSONArray products = obj.getJSONArray("Products");
-                System.out.println(products.toString());
-
-                List<Product> listProductsOrder = new ArrayList<>();
-                for (int k = 0; k < products.length(); k++) {
-                    JSONObject product = products.getJSONObject(k);
-
-                    System.out.println(products.toString());
-                    Product P = new Product();
-                    P.setId(product.getInt("idProdotto"));
-                    P.setPrezzo(Float.parseFloat(product.getString("Price")));
-                    P.setImageURL(product.getString("ImageURL"));
-                    P.setTipo(product.getString("Type"));
-                    P.setNome(product.getString("Name"));
-                    P.setQuantity(product.getInt("Quantity"));
-
-                    JSONArray ingredients = product.getJSONArray("Ingredients");
-                    List<Ingredient> listIngredient = new ArrayList<>();
-                    for (int j = 0; j < ingredients.length(); j++) {
-                        JSONObject ingredient = ingredients.getJSONObject(j);
-
-                        Ingredient I = new Ingredient();
-                        I.setId(Integer.parseInt(ingredient.getString("idIngredient")));
-                        I.setNome(ingredient.getString("Name"));
-                        I.setPrezzo(Float.parseFloat(ingredient.getString("Price")));
-                        listIngredient.add(I);
-
-                    }
-                    P.setListIngredienti(listIngredient);
-                    listProductsOrder.add(P);
-                }
-
-                O.setListProducts(listProductsOrder);
-                OrderList.add(O);
-
-            }
-        }catch (Exception e){e.printStackTrace();}
-    }
-    */
 
     private void loadIntoOrderListView()
     {
+        if(Setting.getDebug())
+            System.out.println("LOAD INTO LISTVIEW");
+
         List<HashMap<String, String>> listitems = new ArrayList<>();
         SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
 
@@ -316,6 +233,9 @@ public class activity_ordini extends AppCompatActivity
     }
     private void loadIntoProductListView(List<Product> listP)
     {
+        if(Setting.getDebug())
+            System.out.println("LOAD INTO LISTVIEW");
+
         List<HashMap<String, String>> listitems = new ArrayList<>();
         SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item_with_quantity, new String[]{"First Line", "Quantity", "Second Line"}, new int[]{R.id.text1, R.id.quantity, R.id.text2});
 
@@ -511,20 +431,5 @@ public class activity_ordini extends AppCompatActivity
         callIntent.setData(Uri.parse("tel: "+ Numero));
         startActivity(callIntent);
     }
-
-    /*
-    private void savePreferences(String NumeroTelefono, String Mail, String Password) {
-        SharedPreferences settings = getSharedPreferences("alPachino",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-
-        // Edit and commit
-        editor.putString("NumeroTelefono", NumeroTelefono);
-        editor.putString("Mail", Mail);
-        editor.putString("Password", Password);
-        editor.commit();
-    }
-
-     */
 
 }

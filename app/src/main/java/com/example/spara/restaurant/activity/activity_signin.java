@@ -12,6 +12,7 @@ import android.os.StrictMode;
 import com.example.spara.restaurant.object.Cart;
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
@@ -139,22 +140,7 @@ public class activity_signin extends AppCompatActivity
                 String cap = Cap.getText().toString().trim().replaceAll(" ", "%20");
                 String numeroTelefono = NumeroTelefono.getText().toString().trim();
 
-                /*
-                System.out.println(mail);
-                System.out.println(getString(R.string.SampleMail));
-                System.out.println(password);
-                System.out.println(R.string.SamplePassword);
-                System.out.println(confermaPassword);
-                System.out.println(R.string.SamplePassword);
-                System.out.println(nome);
-                System.out.println(R.string.SampleNome);
-                System.out.println(cognome);
-                System.out.println(R.string.SampleCognome);
-                System.out.println(indirizzo);
-                System.out.println(R.string.SampleIndirizzo);
-                System.out.println(numeroTelefono);
-                System.out.println(R.string.SampleTelefono);
-                */
+
 
 
                 if(!mail.equals(getString(R.string.SampleMail)) && confermaPassword.equals(password) && !password.equals(getString(R.string.SamplePassword)) && !confermaPassword.equals(getString(R.string.SampleConfermaPassword)) && !nome.equals(getString(R.string.SampleNome)) && !cognome.equals(getString(R.string.SampleCognome))
@@ -168,18 +154,16 @@ public class activity_signin extends AppCompatActivity
 
                                 String IndirizzoCompleto = indirizzo + ", " + cap + ", " + citta;
                                 IndirizzoCompleto = IndirizzoCompleto.replaceAll(" ", "%20");
-                                System.out.println(IndirizzoCompleto);
+                                if(Setting.getDebug())
+                                    System.out.println("INITIALIZE USER");
                                 User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, Restaurant.getId(), false);
 
                                 String par = "NumeroTelefono=" + U.getNumeroTelefono();
                                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
                                 JSONObject obj = new JSONObject(tmpJSON);
-                                System.out.println(obj);
 
                                 if(obj.length() == 0) {
 
-                                    //String Via = U.getIndirizzo().replaceAll(" ", "%20");
-                                    //System.out.println(Via);
                                     par = "NumeroTelefono=" + U.getNumeroTelefono() + "&Nome=" + U.getNome() + "&Cognome=" + U.getCognome() + "&Mail=" + U.getMail() + "&Indirizzo=" + U.getIndirizzo() + "&Password=" + U.getPassword() + "&Confermato=" + U.getConfermato() + "&Amministratore=" + U.getAmministratore() +"&idLocale=" + U.getIdLocale() + "&Disabilitato=" + U.getDisabilitato();
                                     runOnUiThread(new Runnable() {
                                         @Override
@@ -189,9 +173,6 @@ public class activity_signin extends AppCompatActivity
                                     });
 
                                     InsertIntoDB(Connection.getURL(WebConnection.query.INSERTUSER, par));
-
-                                    //par="idLocale=1&NumeroTelefono=" + U.getNumeroTelefono();
-                                    //InsertIntoDB(Connection.getURL(WebConnection.query.INSERTLOCALUSER, par));
 
                                     runOnUiThread(new Runnable() {
                                         @Override
@@ -313,6 +294,8 @@ public class activity_signin extends AppCompatActivity
                         v.startAnimation(animation1);
                     }
                 });
+                if(Setting.getDebug())
+                    System.out.println("BACK <--");
                 Intent I = new Intent(activity_signin.this, MainActivity.class);
                 startActivity(I);
                 activity_signin.this.finish();
@@ -528,29 +511,7 @@ public class activity_signin extends AppCompatActivity
 
     }
 
-    /*
-    private String downloadJSON(final String urlWebService) {
 
-        try {
-
-            URL url = new URL(urlWebService);
-
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            return "";
-        }
-
-    }
-
-     */
     private void showLoadingDialog() {
         pd = new ProgressDialog(this, R.style.DialogTheme);
         pd.setTitle("Loading...");

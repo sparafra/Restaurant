@@ -14,6 +14,7 @@ import com.example.spara.restaurant.object.Ingredient;
 import com.example.spara.restaurant.object.Product;
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.example.spara.restaurant.custom_adapter.customAdapter_personalizza;
@@ -107,8 +108,6 @@ public class activity_personalizza extends AppCompatActivity
         listviewChoosedIngredients = findViewById(R.id.listIngredientiScelti);
 
         //Button Declaration
-        //addIngredient = findViewById(R.id.addIgredient);
-        //deleteIngredient = findViewById(R.id.cancellaIngrediente);
         back = findViewById(R.id.indietro);
         save = findViewById(R.id.salva);
 
@@ -117,6 +116,8 @@ public class activity_personalizza extends AppCompatActivity
         imgTransparent.setAlpha(230);
 
         //Get Intent Extra
+        if(Setting.getDebug())
+            System.out.println("INITIALIZE PREFERENCES");
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
         UserLogged = (User) getIntent().getParcelableExtra("User");
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
@@ -124,6 +125,8 @@ public class activity_personalizza extends AppCompatActivity
 
         if(UserLogged.getAmministratore())
         {
+            if(Setting.getDebug())
+                System.out.println("SETTING THE ADDITIONAL PANEL FOR ADMIN");
             navigationView.getMenu().findItem(R.id.nav_gestione_ordini).setVisible(true);
         }
 
@@ -187,101 +190,16 @@ public class activity_personalizza extends AppCompatActivity
                 posSelected = -1;
             }
         });
-        /*
-        addIngredient.setOnClickListener(new View.OnClickListener() {
-            //@Override
-            public void onClick(View v) {
 
-                if(posSelected != -1) {
-                    new Thread(new Runnable() {
-                        public void run() {
-                            listChoosedIngredients.add(listIngredients.get(posSelected));
-                            listIngredients.remove(posSelected);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // Stuff that updates the UI
-                                    loadIntoIngredientListView();
-                                    loadIntoChoosedIngredientListView();
-
-                                    Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                                    animation1.setDuration(1000);
-
-                                    addIngredient.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
-                                    v.startAnimation(animation1);
-                                    animation1.setAnimationListener(new Animation.AnimationListener() {
-                                        @Override
-                                        public void onAnimationStart(Animation animation) {
-
-                                        }
-
-                                        @Override
-                                        public void onAnimationEnd(Animation animation) {
-                                            addIngredient.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                                            if(listChoosedIngredients.size() == 1) {
-                                                save.setVisibility(View.VISIBLE);
-                                                Animation animation2 = new AlphaAnimation(0.3f, 1.0f);
-                                                animation2.setDuration(1000);
-                                                save.startAnimation(animation2);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onAnimationRepeat(Animation animation) {
-
-                                        }
-                                    });
-
-                                }
-                            });
-
-
-                        }
-                    }).start();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(), "Seleziona un Ingrediente", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        deleteIngredient.setOnClickListener(new View.OnClickListener() {
-            //@Override
-            public void onClick(View v) {
-
-                if(posSelectedChoosed != -1) {
-                    new Thread(new Runnable() {
-                        public void run() {
-                            listIngredients.add(listChoosedIngredients.get(posSelectedChoosed));
-                            listChoosedIngredients.remove(posSelectedChoosed);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // Stuff that updates the UI
-                                    loadIntoIngredientListView();
-                                    loadIntoChoosedIngredientListView();
-
-                                    Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                                    animation1.setDuration(1000);
-
-                                    v.startAnimation(animation1);
-                                }
-                            });
-                            posSelectedChoosed = -1;
-                        }
-                    }).start();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(), "Seleziona un Ingrediente", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        */
         save.setOnClickListener(new View.OnClickListener() {
 
             //@Override
             public void onClick(View v) {
 
                 if(listChoosedIngredients.size() > 0) {
+                    if(Setting.getDebug())
+                        System.out.println("INITIALIZE PRODUCT");
+
                     Product P = new Product();
                     P.setNome("Personalizzata");
                     float prezzo = 0;
@@ -329,6 +247,8 @@ public class activity_personalizza extends AppCompatActivity
                         v.startAnimation(animation1);
                         }
                 });
+                if(Setting.getDebug())
+                    System.out.println("BACK <--");
                 Intent I = new Intent(activity_personalizza.this, activity_home.class);
                 I.putExtra("Cart", cartProducts);
                 I.putExtra("User", UserLogged);
@@ -340,46 +260,7 @@ public class activity_personalizza extends AppCompatActivity
         });
 
     }
-    /*
-    private String downloadJSON(final String urlWebService) {
 
-        try {
-            URL url = new URL(urlWebService);
-
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString().trim();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-     */
-
-    /*
-    private void fillIngredientList(String json) {
-        try {
-            listIngredients = new ArrayList<>();
-            JSONArray jsonArray = new JSONArray(json);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                Ingredient I = new Ingredient();
-                I.setId(obj.getInt("idIngrediente"));
-                I.setNome(obj.getString("Nome"));
-                I.setPrezzo(Float.parseFloat(obj.getString("Costo")));
-                listIngredients.add(I);
-
-            }
-        }catch (Exception e){e.printStackTrace();}
-    }
-
-     */
 
     public void loadIntoIngredientListView()
     {
@@ -400,6 +281,9 @@ public class activity_personalizza extends AppCompatActivity
 
     public void loadIntoChoosedIngredientListView()
     {
+        if(Setting.getDebug())
+            System.out.println("LOAD INTO LISTVIEW");
+
         List<HashMap<String, String>> listitems = new ArrayList<>();
         customAdapter_personalizza adapter = new customAdapter_personalizza(this, listitems, R.layout.list_item_icon, new String[]{"First Line", "Icon1", "Second Line"}, new int[]{R.id.text1, R.id.icon1, R.id.text2}, listIngredients, listChoosedIngredients);
 
@@ -588,17 +472,4 @@ public class activity_personalizza extends AppCompatActivity
         startActivity(callIntent);
     }
 
-    /*
-    private void savePreferences(String NumeroTelefono, String Mail, String Password) {
-        SharedPreferences settings = getSharedPreferences("alPachino",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-
-        // Edit and commit
-        editor.putString("NumeroTelefono", NumeroTelefono);
-        editor.putString("Mail", Mail);
-        editor.putString("Password", Password);
-        editor.commit();
-    }
-    */
 }

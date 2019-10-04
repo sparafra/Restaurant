@@ -294,20 +294,7 @@ public class activity_map extends AppCompatActivity
             // permissions this app might request.
         }
     }
-    /*
-    private void savePreferences(String NumeroTelefono, String Mail, String Password) {
-        SharedPreferences settings = getSharedPreferences("alPachino",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
 
-        // Edit and commit
-        editor.putString("NumeroTelefono", NumeroTelefono);
-        editor.putString("Mail", Mail);
-        editor.putString("Password", Password);
-        editor.commit();
-    }
-
-     */
     public void callPhone(String Numero)
     {
         Intent callIntent = new Intent(Intent.ACTION_CALL);

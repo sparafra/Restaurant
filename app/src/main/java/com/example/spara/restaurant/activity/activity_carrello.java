@@ -20,6 +20,7 @@ import com.example.spara.restaurant.object.Preference;
 import com.example.spara.restaurant.object.Product;
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.example.spara.restaurant.custom_adapter.customAdapter_carrello;
@@ -121,6 +122,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         Button btnOrder = findViewById(R.id.prenota);
         ImageView imgProduct = findViewById(R.id.imgProduct);
 
+        if(Setting.getDebug())
+            System.out.println("INITIALIZE PREFERENCES");
 
         //Get INTENT Extra
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
@@ -129,6 +132,9 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
 
         if(UserLogged.getAmministratore())
         {
+            if(Setting.getDebug())
+                System.out.println("SETTING THE ADDITIONAL PANEL FOR ADMIN");
+
             navigationView.getMenu().findItem(R.id.nav_gestione_ordini).setVisible(true);
         }
 
@@ -137,6 +143,9 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             loadIntoListView(cartProducts.getListProducts());
         }
         else{
+            if(Setting.getDebug())
+                System.out.println("BUTTON HIDE ORDER AND CLEARCART");
+
             btnClearCart.setVisibility(View.INVISIBLE);
             btnOrder.setVisibility(View.INVISIBLE);
         }
@@ -203,6 +212,9 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             public void onClick(View v) {
                 new Thread(new Runnable() {
                     public void run() {
+                        if(Setting.getDebug())
+                            System.out.println("CLEAR CART");
+
                         cartProducts.clear();
                         runOnUiThread(new Runnable() {
                             @Override
@@ -245,35 +257,38 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             //@Override
             public void onClick(View v) {
 
+                if(Setting.getDebug())
+                    System.out.println("PREPARE ORDER");
+
                 //INSERT INTO DATABASE ORDER WITH THIS CART
                 if (UserLogged.getConfermato()) {
+                    if(Setting.getDebug())
+                        System.out.println("INITIALIZE ORDER");
+
                     O = new Order();
                     O.setListProducts(cartProducts.getListProducts());
                     O.setStato("Richiesto");
                     O.setAsporto(false);
                     O.setNumeroTelefono(UserLogged.getNumeroTelefono());
+
                     Date currentTime = Calendar.getInstance().getTime();
-                    SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-                    SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
                     SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
-
-                    String dateStr = date.format(currentTime);
-                    String timeStr = time.format(currentTime);
-
                     String date_time = datetime.format(currentTime);
 
-                    System.out.println(date_time);
-                    System.out.println(currentTime.toString());
 
                     O.setDateTime(currentTime);
                     O.setCosto(cartProducts.getTotalCost());
-                    System.out.println("CART COSTO: " + cartProducts.getTotalCost());
+                    if(Setting.getDebug())
+                        System.out.println("CART COSTO: " + cartProducts.getTotalCost());
+
                     try {
                         showLoadingDialog();
                         new Thread(new Runnable() {
                             public void run() {
                                 InsertOrderProduct(O);
 
+                                if(Setting.getDebug())
+                                    System.out.println("SEND NOTICE TO ALL ADMIN");
 
                                 String par = "idLocale=" + Restaurant.getId() + "&Amministratore=true";
                                 String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.ADMINLIST, par));
@@ -281,6 +296,9 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
 
                                 for(int k=0; k<AdminUsers.size(); k++)
                                 {
+                                    if(Setting.getDebug())
+                                        System.out.println("PREPARE NOTICE FOR: " + AdminUsers.get(k).getNumeroTelefono());
+
                                     Notice N = new Notice();
                                     N.setStato(false);
                                     N.setRicevutoDa(AdminUsers.get(k).getNumeroTelefono());
@@ -335,22 +353,17 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
     }
     @Override
     public void onFinishEditDialog(String inputText) {
-        //Toast.makeText(this, "Hi, " + inputText, Toast.LENGTH_SHORT).show();
+
         if(inputText.equals("Si"))
         {
+            if(Setting.getDebug())
+                System.out.println("UPDATE ORDER TO INSERT DOMICILIO");
+
             O.setAsporto(true);
             O.setCosto(O.getTotaleCosto() + 1);
-            SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-            SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
-            String dateStr = date.format(O.getDateTime());
-            String timeStr = time.format(O.getDateTime());
 
             SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
             String date_time = datetime.format(O.getDateTime());
-
-            System.out.println("UPDATE");
-
-            System.out.println(O.getTotaleCosto());
 
             String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() + "&Costo=" + O.getTotaleCosto() +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&DataOra=" + date_time.replaceAll(" ", "%20");
 
@@ -372,33 +385,31 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
     private void InsertOrderProduct(Order O)
     {
 
-        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-        SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
-        String dateStr = date.format(O.getDateTime());
-        String timeStr = time.format(O.getDateTime());
+        if(Setting.getDebug())
+            System.out.println("INSERT ORDER");
+
         SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
         String date_time = datetime.format(O.getDateTime());
-        System.out.println(O.getTotaleCosto());
         String par = "Asporto=" + O.getAsporto() + "&Pagato=false" +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale=" + UserLogged.getIdLocale() + "&Costo=" + O.getTotaleCosto() + "&DataOra="+ date_time.replaceAll(" ", "%20") ;
 
         try {
             idOrderInserted = InsertIntoDBWithId(Connection.getURL(WebConnection.query.INSERTORDER, par));
-            //downloadJSON(Connection.getURL(WebConnection.query.INSERTORDER, par)); // Insert Order
             O.setId(idOrderInserted);
-            System.out.println("Order Inserito");
+            if(Setting.getDebug())
+                System.out.println("ORDER INSERTED CORRECTLY");
+
         }catch (Exception e){}
 
 
 
         for (int k = 0; k < O.getListProducts().size(); k++) {
-            System.out.println(O.getListProducts().get(k).getNome());
             if (O.getListProducts().get(k).getNome().equals("Personalizzata")) {
+
+                if(Setting.getDebug())
+                    System.out.println("INSERT CUSTOM PRODUCT FOR ORDER: " + O.getId());
 
                 par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&Tipo=" + O.getListProducts().get(k).getTipo() +"&idLocale=" + Restaurant.getId() + "&ImageURL="+ O.getListProducts().get(k).getImageURL() ;
                 idProductEdited = InsertIntoDBWithId(Connection.getURL(WebConnection.query.INSERTPRODUCT, par));
-
-                //par = "idProdotto=" + String.valueOf(idProductEdited) + "&Tipo=" + O.getListProducts().get(k).getTipo();
-                //InsertIntoDB(Connection.getURL(WebConnection.query.INSERTPRODUCTTIPOLOGY, par));
 
                 for(int i=0; i<O.getListProducts().get(k).getListIngredienti().size(); i++)
                 {
@@ -406,12 +417,14 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                     par = "idProdotto=" + String.valueOf(idProductEdited) + "&idIngrediente=" + I.getId();
                     InsertIntoDB(Connection.getURL(WebConnection.query.INSERTPRODUCTINGREDIENT, par));
                 }
-                System.out.println(String.valueOf(idProductEdited));
 
                 par = "idOrdine=" + idOrderInserted + "&idProdotto=" + idProductEdited + "&Quantita=" + O.getListProducts().get(k).getQuantity();
                 InsertIntoDB(Connection.getURL(WebConnection.query.INSERTORDERPRODUCT, par)); // InsertOrderProduct
             }
             else{
+                if(Setting.getDebug())
+                    System.out.println("INSERT PRODUCT FOR ORDER: " + O.getId());
+
                 par = "idOrdine=" + idOrderInserted + "&idProdotto=" + O.getListProducts().get(k).getId() + "&Quantita=" + O.getListProducts().get(k).getQuantity();
                 InsertIntoDB(Connection.getURL(WebConnection.query.INSERTORDERPRODUCT, par)); // InsertOrderProduct
             }
@@ -419,52 +432,6 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         }
     }
 
-    /*
-    private String downloadJSON(final String urlWebService) {
-
-        try {
-            URL url = new URL(urlWebService);
-
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString().trim();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-    private List<User> fillUsers(String json)
-    {
-        List<User> list = new ArrayList<>();
-        try {
-
-            JSONArray jsonArray = new JSONArray(json);
-            for(int k=0; k< jsonArray.length(); k++) {
-                JSONObject obj = jsonArray.getJSONObject(k);
-                User U = new User();
-                U.setNumeroTelefono(obj.getString("NumeroTelefono"));
-                U.setMail(obj.getString("Mail"));
-                U.setPassword(obj.getString("Password"));
-                U.setNome(obj.getString("Nome"));
-                U.setCognome(obj.getString("Cognome"));
-                U.setIndirizzo(obj.getString("Indirizzo"));
-                U.setAmministratore(obj.getBoolean("Amministratore"));
-                U.setConfermato(obj.getBoolean("Confermato"));
-                U.setIdLocale(obj.getLong("idLocale"));
-
-                list.add(U);
-            }
-        }catch (Exception e){e.printStackTrace();}
-        finally {
-            return list;
-        }
-    }
-    */
 
     private void InsertIntoDB(final String urlWebService) {
 
@@ -483,8 +450,12 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                     sb.append("Inserito");
                 }
             }
+            if(Setting.getDebug())
+                System.out.println("INSERT INTO DATABASE URL REQUEST SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();
+            if(Setting.getDebug())
+                System.out.println("INSERT INTO DATABASE URL REQUEST FAILED");
         }
     }
     private int InsertIntoDBWithId(final String urlWebService) {
@@ -504,19 +475,26 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                     sb.append(bufferedReader.readLine());
                 }
             }
+            if(Setting.getDebug())
+                System.out.println("INSERT INTO DATABASE URL REQUEST SUCCESS");
+
             return Integer.parseInt(sb.toString().trim());
         } catch (Exception e) {
             e.printStackTrace();
+            if(Setting.getDebug())
+                System.out.println("INSERT INTO DATABASE URL REQUEST FAILED");
             return -1;
         }
     }
 
     private void loadIntoListView(List<Product> listP)
     {
+        if(Setting.getDebug())
+            System.out.println("LOAD INTO LISTVIEW");
+
         List<HashMap<String, String>> listitems = new ArrayList<>();
         //SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
         customAdapter_carrello adapter = new customAdapter_carrello(this, listitems, R.layout.list_item__with_2_icon, new String[]{"First Line", "Icon", "Second Line"}, new int[]{R.id.text1, R.id.icon, R.id.text2});
-
 
 
         List<Ingredient> listI;
@@ -712,17 +690,4 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         startActivity(callIntent);
     }
 
-    /*
-    private void savePreferences(String NumeroTelefono, String Mail, String Password, Activity act) {
-        SharedPreferences settings = act.getSharedPreferences("alPachino",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-
-        // Edit and commit
-        editor.putString("NumeroTelefono", NumeroTelefono);
-        editor.putString("Mail", Mail);
-        editor.putString("Password", Password);
-        editor.commit();
-    }
-    */
 }

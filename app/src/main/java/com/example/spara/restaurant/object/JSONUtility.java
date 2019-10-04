@@ -103,14 +103,7 @@ public class JSONUtility {
                 JSONObject obj = jsonArray.getJSONObject(i);
                 Product P = new Product();
                 Ingredienti = new StringBuilder();
-                /*
-                for (int k = 0; k < stocks.length && !presente; k++) {
-                    if (obj.getString("Name").equals(stocks[k][0])) {
-                        presente = true;
-                    }
-                }
 
-                 */
                 if (!presente) {
                     P.setId(Integer.parseInt(obj.getString("id")));
                     P.setPrezzo(Float.parseFloat(obj.getString("Price")));
@@ -120,7 +113,6 @@ public class JSONUtility {
                     P.setQuantity(obj.getInt("Quantity"));
                     P.setIdLocale(obj.getLong("idLocal"));
 
-                    //stocks[nProdotti][0] = obj.getString("Name");
                     String prezzo = obj.getString("Price");
 
                     int nIngredienti = 0;
@@ -132,7 +124,6 @@ public class JSONUtility {
                     for (int k = 0; k < jsonArrayIngredientsOfProduct.length(); k++) {
                         JSONObject tmpobj = jsonArrayIngredientsOfProduct.getJSONObject(k);
                         Ingredient I = new Ingredient();
-                        //if (tmpobj.getString("Name").equals(stocks[nProdotti][0])) {
                         if (nIngredienti == 0) {
                             Ingredienti.append(tmpobj.getString("Name"));
                         } else {
@@ -166,8 +157,7 @@ public class JSONUtility {
                     } else {
                         Ingredienti.append(" €" + prezzo);
                     }
-                    //stocks[nProdotti][1] = Ingredienti.toString().trim();
-                    //nProdotti++;
+
                     P.setListIngredienti(listIngredients);
                     P.setListReview(listReview);
                     listProducts.add(P);
@@ -182,27 +172,16 @@ public class JSONUtility {
 
         try {
             Order O = new Order();
-            //JSONArray jsonArray = new JSONArray(json);
             JSONObject obj = new JSONObject(json);
 
             O.setId(obj.getInt("idOrdine"));
             O.setStato(obj.getString("Stato"));
-            if (obj.getBoolean("Asporto") == false) {
-                O.setAsporto(false);
-            } else {
-                O.setAsporto(true);
-            }
+            O.setAsporto(obj.getBoolean("Asporto"));
             O.setNumeroTelefono(obj.getString("NumeroTelefono"));
             O.setCosto(Float.parseFloat(obj.getString("Costo")));
 
             SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
-            SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-            Date d1 = null;
-            try {
-                d1 = sdf3.parse(obj.getString("DataOra"));
-            } catch (Exception e) {
-                d1 = sdf4.parse(obj.getString("DataOra"));
-            }
+            Date d1 = sdf3.parse(obj.getString("DataOra"));
 
             O.setDateTime(d1);
             O.setCosto(Float.valueOf(obj.getString("Costo")));
@@ -255,25 +234,16 @@ public class JSONUtility {
                 Order O = new Order();
                 O.setId(obj.getInt("idOrdine"));
                 O.setStato(obj.getString("Stato"));
-                if (obj.getBoolean("Asporto") == false) {
-                    O.setAsporto(false);
-                } else {
-                    O.setAsporto(true);
-                }
+                O.setAsporto(obj.getBoolean("Asporto"));
+
                 O.setNumeroTelefono(obj.getString("NumeroTelefono"));
                 O.setCosto(Float.parseFloat(obj.getString("Costo")));
 
                 SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
-                SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-                Date d1 = null;
-                try {
-                    d1 = sdf3.parse(obj.getString("DataOra"));
-                } catch (Exception e) {
-                    d1 = sdf4.parse(obj.getString("DataOra"));
-                }
+                Date d1 = sdf3.parse(obj.getString("DataOra"));
+
                 O.setDateTime(d1);
-                System.out.println(O.getDateTime());
-                System.out.println(obj.getString("DataOra"));
+
                 JSONArray products = obj.getJSONArray("Products");
                 System.out.println(products.toString());
 

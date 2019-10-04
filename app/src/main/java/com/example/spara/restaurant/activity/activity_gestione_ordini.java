@@ -17,6 +17,7 @@ import com.example.spara.restaurant.object.Preference;
 import com.example.spara.restaurant.object.Product;
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
@@ -55,6 +56,8 @@ import java.util.List;
 import java.util.Locale;
 
 import lib.kingja.switchbutton.SwitchMultiButton;
+
+import static com.example.spara.restaurant.object.JSONUtility.fillOrderList;
 
 public class activity_gestione_ordini extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -105,17 +108,7 @@ public class activity_gestione_ordini extends AppCompatActivity
 
         //MY CODE
 
-        /*
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-// Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.order_filter_array, R.layout.row);
-// Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
-        */
 
 
         //Background Image Declaration
@@ -128,6 +121,8 @@ public class activity_gestione_ordini extends AppCompatActivity
         listProducts = (ListView) findViewById(R.id.listProdotti);
 
         //Get INTENT Extra
+        if(Setting.getDebug())
+            System.out.println("INITIALIZE PREFERENCES");
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
         UserLogged = (User) getIntent().getParcelableExtra("User");
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
@@ -135,18 +130,20 @@ public class activity_gestione_ordini extends AppCompatActivity
 
         if(UserLogged.getAmministratore())
         {
+            if(Setting.getDebug())
+                System.out.println("SETTING THE ADDITIONAL PANEL FOR ADMIN");
             navigationView.getMenu().findItem(R.id.nav_gestione_ordini).setVisible(true);
         }
-        //Toast.makeText(getApplicationContext(), UserLogged.getNumeroTelefono(), Toast.LENGTH_SHORT).show();
 
 
         String par = "idLocale=" + Restaurant.getId() + "&Stato=Richiesto";
         showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
-                        System.out.println(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
+                        if(Setting.getDebug())
+                            System.out.println("SEARCH ORDER BY RICHIESTO STATE");
                         String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
-                        fillOrderList(tmpJSON);
+                        OrderList = fillOrderList(tmpJSON);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -191,65 +188,14 @@ public class activity_gestione_ordini extends AppCompatActivity
             }
         });
 
-        /*
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int pos, long id) {
-                // An item was selected. You can retrieve the selected item using
-                // parent.getItemAtPosition(pos)
-                String par;
-                switch (parent.getItemAtPosition(pos).toString())
-                {
-                    case "Richiesto":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=Richiesto";
-                        break;
-                    case "In Preparazione":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=In%20Preparazione";
-                        break;
-                    case "In Consegna":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=In%20Consegna";
-                        break;
-                    case "Consegnato":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=Consegnato";
-                        break;
-                    case "Tutto":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=all";
-                        break;
-                    default:
-                        par="";
-                }
-                showLoadingDialog();
-                new Thread(new Runnable() {
-                    public void run() {
-                        System.out.println(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
-                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
-                        fillOrderList(tmpJSON);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Stuff that updates the UI
-                                loadIntoOrderListView();
-                                pd.dismiss();
-                            }
-                        });
-                    }
-                }).start();
-                //Toast.makeText(getApplicationContext(), parent.getItemAtPosition(pos).toString(), Toast.LENGTH_LONG).show();
 
-            }
-
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Another interface callback
-            }
-        });
-*/
 
         filter = (SwitchMultiButton) findViewById(R.id.filter);
         filter.setOnSwitchListener(new SwitchMultiButton.OnSwitchListener() {
             @Override
             public void onSwitch(int position, String tabText) {
-                System.out.println("asd");
+                if(Setting.getDebug())
+                    System.out.println("FILTER BY " + tabText);
 
                 String par;
                 switch (tabText)
@@ -275,9 +221,10 @@ public class activity_gestione_ordini extends AppCompatActivity
                 showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
-                        System.out.println(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
+                        if(Setting.getDebug())
+                            System.out.println("SEARCH ORDER BY " + tabText +" STATE");
                         String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.ORDERPRODUCTSUSERSTATE, par));
-                        fillOrderList(tmpJSON);
+                        OrderList = fillOrderList(tmpJSON);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -302,80 +249,11 @@ public class activity_gestione_ordini extends AppCompatActivity
     }
 
 
-
-
-    private void fillOrderList(String json) {
-        try {
-            OrderList = new ArrayList<>();
-            JSONArray jsonArray = new JSONArray(json);
-            System.out.println(jsonArray.toString());
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                System.out.println(obj.toString());
-
-                Order O = new Order();
-                O.setId(obj.getInt("idOrdine"));
-                O.setStato(obj.getString("Stato"));
-                if (obj.getBoolean("Asporto") == false) {
-                    O.setAsporto(false);
-                } else {
-                    O.setAsporto(true);
-                }
-                O.setNumeroTelefono(obj.getString("NumeroTelefono"));
-                O.setCosto(Float.parseFloat(obj.getString("Costo")));
-
-                SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
-                SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-                Date d1 = null;
-                try {
-                    d1 = sdf3.parse(obj.getString("DataOra"));
-                } catch (Exception e) {
-                    d1 = sdf4.parse(obj.getString("DataOra"));
-                }
-                O.setDateTime(d1);
-                System.out.println(O.getDateTime());
-                System.out.println(obj.getString("DataOra"));
-                JSONArray products = obj.getJSONArray("Products");
-                System.out.println(products.toString());
-
-                List<Product> listProductsOrder = new ArrayList<>();
-                for (int k = 0; k < products.length(); k++) {
-                    JSONObject product = products.getJSONObject(k);
-
-                    System.out.println(products.toString());
-                    Product P = new Product();
-                    P.setId(product.getInt("idProdotto"));
-                    P.setPrezzo(Float.parseFloat(product.getString("Price")));
-                    P.setImageURL(product.getString("ImageURL"));
-                    P.setTipo(product.getString("Type"));
-                    P.setNome(product.getString("Name"));
-                    P.setQuantity(product.getInt("Quantity"));
-
-                    JSONArray ingredients = product.getJSONArray("Ingredients");
-                    List<Ingredient> listIngredient = new ArrayList<>();
-                    for (int j = 0; j < ingredients.length(); j++) {
-                        JSONObject ingredient = ingredients.getJSONObject(j);
-
-                        Ingredient I = new Ingredient();
-                        I.setId(Integer.parseInt(ingredient.getString("idIngredient")));
-                        I.setNome(ingredient.getString("Name"));
-                        I.setPrezzo(Float.parseFloat(ingredient.getString("Price")));
-                        listIngredient.add(I);
-
-                    }
-                    P.setListIngredienti(listIngredient);
-                    listProductsOrder.add(P);
-                }
-
-                O.setListProducts(listProductsOrder);
-                OrderList.add(O);
-
-            }
-        }catch (Exception e){e.printStackTrace();}
-    }
-
     private void loadIntoOrderListView()
     {
+        if(Setting.getDebug())
+            System.out.println("LOAD INTO LISTVIEW");
+
         List<HashMap<String, String>> listitems = new ArrayList<>();
         SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
 

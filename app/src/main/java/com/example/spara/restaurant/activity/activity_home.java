@@ -28,6 +28,7 @@ import android.os.StrictMode;
 
 import com.example.spara.restaurant.object.JSONUtility;
 import com.example.spara.restaurant.object.Preference;
+import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.service.Background;
 import com.example.spara.restaurant.object.Cart;
 import com.example.spara.restaurant.object.Ingredient;
@@ -72,9 +73,9 @@ public class activity_home extends AppCompatActivity
 
     //PERMISSION CODE
     //CALL - 1
-    //INTERNET -2
+    //INTERNET - 2
 
-    Long TimeToAlarm = Long.valueOf(60000); //1 minutes
+    Long TimeToAlarm = 5L * 60L * 1000L; //5 minutes
 
     public static final int REQUEST_CODE=101;
 
@@ -90,6 +91,7 @@ public class activity_home extends AppCompatActivity
 
     AlarmManager alarmManager;
     PendingIntent pendingIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,6 +153,9 @@ public class activity_home extends AppCompatActivity
 
         //MY CODE
 
+        if(Setting.getDebug())
+            System.out.println("INITIALIZE PREFERENCES");
+
         //Get INTENT Extra
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
         UserLogged = (User) getIntent().getParcelableExtra("User");
@@ -172,16 +177,25 @@ public class activity_home extends AppCompatActivity
 
         //Starting background service
 
-        /*
-        Intent I1 = new Intent(activity_home.this, Background.class);
-        I1.putExtra("UserNumber", UserLogged.getNumeroTelefono());
-        //I.putExtra("WebConnection" ,Connection);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            startForegroundService(I1);
-        else
-            startService(I1);
+        if(Setting.getDebug())
+            System.out.println("INITIALIZE ALARM");
 
-         */
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(this, background_alarm.class);
+        intent.putExtra("UserNumber", UserLogged.getNumeroTelefono());
+
+        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        /*
+        Alarm will be triggered approximately after 5 Min and will be repeated every hour after that
+        */
+
+        if(Setting.getDebug())
+            System.out.println("CALL START ALARM METHOD");
+
+        startAlarm(TimeToAlarm);
+
 
         /*
         if(Restaurant.getId() == 1) {
@@ -198,33 +212,6 @@ public class activity_home extends AppCompatActivity
 
          */
 
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        Intent intent = new Intent(this, background_alarm.class);
-        intent.putExtra("UserNumber", UserLogged.getNumeroTelefono());
-
-        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-
-        /*
-        Alarm will be triggered approximately after one hour and will be repeated every hour after that
-        */
-        //Long intervalMillis = 1L * 60L * 1000L;
-        //Long triggerAtMillis = System.currentTimeMillis() + intervalMillis;
-        //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-        //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);
-        System.out.println("Start");
-        startAlarm();
-        /*
-        1st Param : Type of the Alarm
-
-        2nd Param : Time in milliseconds when the alarm will be triggered first
-
-        3rd Param : Interval after which alarm will be repeated . You can only use any one of the AlarmManager constants
-
-        4th Param :Pending Intent
-
-        */
-
 
 
 
@@ -235,6 +222,9 @@ public class activity_home extends AppCompatActivity
         }
         if(UserLogged.getAmministratore())
         {
+            if(Setting.getDebug())
+                System.out.println("SETTING THE ADDITIONAL PANEL FOR ADMIN");
+
             navigationView.getMenu().findItem(R.id.nav_gestione_ordini).setVisible(true);
         }
 
@@ -266,7 +256,10 @@ public class activity_home extends AppCompatActivity
                 }
                 else {
                     if (pizzeSelected) {
-                        System.out.println(listProducts.get(position - 1).getImageURL());
+
+                        if(Setting.getDebug())
+                            System.out.println("SETTING THE IMAGE PRODUCT: " + listProducts.get(position - 1).getImageURL());
+
                         if (listProducts.get(position - 1).getImageURL().equals("nd"))
                         {
                             runOnUiThread(new Runnable() {
@@ -292,8 +285,13 @@ public class activity_home extends AppCompatActivity
                             });
                         }
                     } else {
-                        if (listProducts.get(position).getImageURL().equals("null"))
+                        if (listProducts.get(position).getImageURL().equals("null")) {
+                            if(Setting.getDebug())
+                                System.out.println("IMAGE OF PRODUCT NOT DETECTED, SETTING THE DEFAULT IMAGE PRODUCT" );
+
                             imgProduct.setImageResource(R.drawable.logo);
+
+                        }
                         else {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -309,7 +307,6 @@ public class activity_home extends AppCompatActivity
 
                     HashMap<String, String> Map = (HashMap) parent.getItemAtPosition(position);
                     String selectedItem = Map.get("First Line");
-                    //Toast.makeText(getApplicationContext(), selectedItem, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -333,6 +330,8 @@ public class activity_home extends AppCompatActivity
                 showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
+                        if(Setting.getDebug())
+                            System.out.println("FILTER PANINI");
                         String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.BURGERFRIESINGREDIENTS));
                         listProducts = fillProductsList(tmpJSON);
                         runOnUiThread(new Runnable() {
@@ -365,7 +364,8 @@ public class activity_home extends AppCompatActivity
                 showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
-
+                        if(Setting.getDebug())
+                            System.out.println("FILTER PIZZE");
                         String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.PIZZEINGREDIENTS));
                         listProducts = fillProductsList(tmpJSON);
                         runOnUiThread(new Runnable() {
@@ -399,6 +399,8 @@ public class activity_home extends AppCompatActivity
                 showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
+                        if(Setting.getDebug())
+                            System.out.println("FILTER SALAD");
                         String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.SALADSINGREDIENTS));
                         listProducts = fillProductsList(tmpJSON);
                         runOnUiThread(new Runnable() {
@@ -449,8 +451,13 @@ public class activity_home extends AppCompatActivity
                 });
 
                 if(posSelected != -1) {
+
+                    if(Setting.getDebug())
+                        System.out.println("ADD PRODUCT TO CART");
+
                     if(pizzeSelected)
                     {
+
                         boolean trovato = false;
                         for(int k=0; k<cartProducts.getListProducts().size() && !trovato; k++)
                         {
@@ -499,6 +506,9 @@ public class activity_home extends AppCompatActivity
     }
     private void loadIntoListView(ArrayList<Product> listP)
     {
+        if(Setting.getDebug())
+            System.out.println("LOAD PRODUCT INTO LISTVIEW");
+
         List<HashMap<String, String>> listitems = new ArrayList<>();
         SimpleAdapter adapter = new SimpleAdapter(this, listitems, R.layout.list_item, new String[]{"First Line", "Second Line"}, new int[]{R.id.text1, R.id.text2});
 
@@ -532,96 +542,6 @@ public class activity_home extends AppCompatActivity
         list.setAdapter(adapter);
     }
 
-    /*
-    private void fillProductsList(String json)
-    {
-        try {
-            System.out.println(json);
-            listProducts = new ArrayList<>();
-            JSONArray jsonArray = new JSONArray(json);
-            String[][] stocks = new String[jsonArray.length()][2];
-            StringBuilder Ingredienti;
-            //int nProdotti = 0;
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                boolean presente = false;
-                JSONObject obj = jsonArray.getJSONObject(i);
-                Product P = new Product();
-                Ingredienti = new StringBuilder();
-                /*
-                for (int k = 0; k < stocks.length && !presente; k++) {
-                    if (obj.getString("Name").equals(stocks[k][0])) {
-                        presente = true;
-                    }
-                }
-                /
-
-                if (!presente) {
-                    P.setId(Integer.parseInt(obj.getString("id")));
-                    P.setPrezzo(Float.parseFloat(obj.getString("Price")));
-                    P.setTipo(obj.getString("Type"));
-                    P.setNome(obj.getString("Name"));
-                    P.setImageURL(obj.getString("ImageURL"));
-                    P.setQuantity(obj.getInt("Quantity"));
-                    P.setIdLocale(obj.getLong("idLocal"));
-
-                    //stocks[nProdotti][0] = obj.getString("Name");
-                    String prezzo = obj.getString("Price");
-
-                    int nIngredienti = 0;
-                    List<Ingredient> listIngredients = new ArrayList<>();
-                    List<ReviewProduct> listReview = new ArrayList<>();
-
-                    JSONArray jsonArrayIngredientsOfProduct = obj.getJSONArray("Ingredients");
-
-                    for (int k = 0; k < jsonArrayIngredientsOfProduct.length(); k++) {
-                        JSONObject tmpobj = jsonArrayIngredientsOfProduct.getJSONObject(k);
-                        Ingredient I = new Ingredient();
-                        //if (tmpobj.getString("Name").equals(stocks[nProdotti][0])) {
-                            if (nIngredienti == 0) {
-                                Ingredienti.append(tmpobj.getString("Name"));
-                            } else {
-                                Ingredienti.append(", " + tmpobj.getString("Name"));
-                            }
-                            I.setId(Integer.parseInt(tmpobj.getString("id")));
-                            I.setNome(tmpobj.getString("Name"));
-                            I.setPrezzo(Float.parseFloat(tmpobj.getString("Price")));
-                            listIngredients.add(I);
-                            nIngredienti++;
-                        //}
-                    }
-                    JSONArray jsonArrayReviewOfProduct = obj.getJSONArray("Reviews");
-
-                    for (int k = 0; k < jsonArrayReviewOfProduct.length(); k++) {
-                        JSONObject tmpobj = jsonArrayReviewOfProduct.getJSONObject(k);
-                        ReviewProduct RP = new ReviewProduct();
-
-                        RP.setVoto(Integer.parseInt(tmpobj.getString("Voto")));
-                        RP.setNumeroTelefono(tmpobj.getString("NumeroTelefono"));
-                        Date date1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(tmpobj.getString("DataOra"));
-                        RP.setDataOra(date1);
-                        RP.setIdProduct(tmpobj.getLong("idProdotto"));
-                        listReview.add(RP);
-                        nIngredienti++;
-                        //}
-                    }
-                    if (nIngredienti == 1 && Ingredienti.toString().equals("null")) {
-                        Ingredienti.delete(0, Ingredienti.length());
-                        Ingredienti.append("€" + prezzo);
-                    } else {
-                        Ingredienti.append(" €" + prezzo);
-                    }
-                    //stocks[nProdotti][1] = Ingredienti.toString().trim();
-                    //nProdotti++;
-                    P.setListIngredienti(listIngredients);
-                    P.setListReview(listReview);
-                    listProducts.add(P);
-                }
-            }
-
-        }catch (Exception e){e.printStackTrace();}
-    }
-*/
 
     @Override
     public void onBackPressed() {
@@ -691,7 +611,6 @@ public class activity_home extends AppCompatActivity
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
             startActivity(I);
-            //startActivity(new Intent(activity_home.this, activity_carrello.class));
             activity_home.this.finish();
         }
         else if (id == R.id.nav_map)
@@ -793,36 +712,30 @@ public class activity_home extends AppCompatActivity
         callIntent.setData(Uri.parse("tel: "+ Numero));
         startActivity(callIntent);
     }
-    /*
-    private void savePreferences(String NumeroTelefono, String Mail, String Password) {
-        SharedPreferences settings = getSharedPreferences("alPachino",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
 
-        // Edit and commit
-        editor.putString("NumeroTelefono", NumeroTelefono);
-        editor.putString("Mail", Mail);
-        editor.putString("Password", Password);
-        editor.commit();
-    }
-     */
 
-    private void startAlarm() {
 
-        Long intervalMillis = 5L * 60L * 1000L;
-        Long triggerAtMillis = System.currentTimeMillis() + intervalMillis;
-        //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);
+    private void startAlarm(Long interval) {
+
+        if(Setting.getDebug())
+            System.out.println("ALARM SETUP INITIALING");
+
+        Long triggerAtMillis = System.currentTimeMillis() + interval;
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, interval, pendingIntent);
         /*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, 0, pendingIntent);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, 0, pendingIntent);
-        } else {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerAtMillis, intervalMillis, pendingIntent);
-        }*/
-        //Toast.makeText(getApplicationContext(), "Alarm", Toast.LENGTH_LONG).show();
+        1st Param : Type of the Alarm
 
+        2nd Param : Time in milliseconds when the alarm will be triggered first
+
+        3rd Param : Interval after which alarm will be repeated . You can only use any one of the AlarmManager constants
+
+        4th Param :Pending Intent
+
+        */
+
+        if(Setting.getDebug())
+            System.out.println("ALARM SETUP COMPLETED");
 
     }
 }
