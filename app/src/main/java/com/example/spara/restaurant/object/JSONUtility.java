@@ -82,6 +82,7 @@ public class JSONUtility {
             U.setAmministratore(obj.getBoolean("Amministratore"));
             U.setConfermato(obj.getBoolean("Confermato"));
             U.setIdLocale(obj.getLong("idLocale"));
+            U.setDisabilitato(obj.getBoolean("Disabilitato"));
 
             return U;
         }catch (Exception e){e.printStackTrace(); return null;}

@@ -20,12 +20,15 @@ import android.view.View;
 
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Cart;
+import com.example.spara.restaurant.object.JSONUtility;
 import com.example.spara.restaurant.object.Preference;
 import com.example.spara.restaurant.object.Restaurant;
+import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -51,6 +54,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static com.example.spara.restaurant.object.JSONUtility.downloadJSON;
+import static com.example.spara.restaurant.object.JSONUtility.fillUser;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -70,7 +74,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        System.out.println("onCreate");
+
+        if(Setting.getDebug())
+            System.out.println("onCreate");
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -138,7 +144,7 @@ public class MainActivity extends AppCompatActivity
         Button login = findViewById(R.id.login);
 
 
-        TextView t1 = findViewById(R.id.textView);
+        TextView t1 = findViewById(R.id.indirizzo_main);
         Typeface typeface = Typeface.createFromAsset(getAssets(),"font/robotoregular.ttf");
         t1.setTypeface(typeface);
 
@@ -146,6 +152,22 @@ public class MainActivity extends AppCompatActivity
 
         ImageView imgTransparent = findViewById(R.id.imageView);
         imgTransparent.setAlpha(230);
+
+        ImageView imgLogo = findViewById(R.id.logo);
+
+        /*
+        if(Restaurant.getId() == 1) {
+            ConstraintLayout content_main = (ConstraintLayout) findViewById(R.id.content_main);
+            TextView indirizzo_main = findViewById(R.id.indirizzo_main);
+
+            content_main.setBackgroundResource(R.drawable.mi_ndujo);
+            imgLogo.setImageResource(R.drawable.logo_panino_genuino);
+            indirizzo_main.setText(Restaurant.getIndirizzo());
+
+            setTitle("Panino Genuino");
+        }
+
+         */
 
         TextView txtMail = findViewById(R.id.mail);
         TextView txtPassword = findViewById(R.id.password);
@@ -162,14 +184,25 @@ public class MainActivity extends AppCompatActivity
                     public void run() {
                         try {
                             String par = "idLocale=" + Restaurant.getId() + "&Mail=" + mail;
-                            System.out.println(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
                             String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
-                            System.out.println("--" + tmpJSON);
+                            if(Setting.getDebug())
+                            {
+                                System.out.println("URL SEARCH ACCOUNT: " + Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
+                                System.out.println("JSON RESULT" + tmpJSON);
+                            }
 
                             JSONArray jsonArray = new JSONArray(tmpJSON);
                             if (jsonArray.length() > 0) {
                                 JSONObject obj = jsonArray.getJSONObject(0);
+
+                                UserLogged = JSONUtility.fillUser(obj.toString());
+                                if(Setting.getDebug())
+                                    System.out.println("USER LOGGED: " + UserLogged.getNumeroTelefono() + ", NOMINATIVO= " + UserLogged.getCognome() + ", " + UserLogged.getNome());
+
+
+                                /*
                                 UserLogged = new User();
+
                                 UserLogged.setMail(obj.getString("Mail"));
                                 UserLogged.setCognome(obj.getString("Cognome"));
                                 UserLogged.setPassword(obj.getString("Password"));
@@ -181,16 +214,19 @@ public class MainActivity extends AppCompatActivity
 
                                 UserLogged.setIdLocale(obj.getLong("idLocale"));
                                 UserLogged.setDisabilitato(obj.getBoolean("Disabilitato"));
-                                /*
-                                if (obj.getString("Disabilitato").equals("0")) {
-                                    UserLogged.setDisabilitato(false);
 
-                                } else {
-                                    UserLogged.setDisabilitato(true);
+                                 */
+                                if(Setting.getDebug()) {
+                                    if(UserLogged.getPassword().equals(txtPassword.getText().toString()))
+                                        System.out.println("PASSWORD MATCHED");
+                                    else {
+                                        System.out.println("PASSWORD NOT EQUALS");
+                                        System.out.println("PASSWORD INPUT: " + txtPassword.getText().toString());
+                                        System.out.println("PASSWORD CORRECT: " + UserLogged.getPassword());
+                                    }
                                 }
-                                */
-                                System.out.println(UserLogged.getPassword());
-                                System.out.println(txtPassword.getText().toString());
+
+
                                 if(UserLogged.getPassword().equals(txtPassword.getText().toString().trim()) && UserLogged.getConfermato() == true && UserLogged.getDisabilitato() == false) {
 
                                     Preference.savePreferences(UserLogged.getNumeroTelefono(), UserLogged.getMail(), UserLogged.getPassword(), MainActivity.this);
@@ -332,16 +368,22 @@ public class MainActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
-        System.out.println("onStart");
+        if(Setting.getDebug())
+            System.out.println("onStart");
+
+
         showLoadingDialog();
         new Thread(new Runnable() {
             public void run() {
 
-                //downloadJSON(Connection.getURL(WebConnection.query.LISTACCOUNTS));
                 loadPreferences();
-                System.out.println(NumeroTelefono);
-                System.out.println(Mail);
-                System.out.println(Password);
+                if(Setting.getDebug())
+                {
+                    System.out.println("NUMERO TELEFONO: " + NumeroTelefono);
+                    System.out.println("MAIL: " + Mail);
+                    System.out.println("PASSWORD: " + Password);
+                }
+
 
                 if(!NumeroTelefono.equals("") && !Mail.equals("") && !Password.equals(""))
                 {
@@ -351,14 +393,19 @@ public class MainActivity extends AppCompatActivity
                         JSONArray jsonArray = new JSONArray(tmpJSON);
                         if (jsonArray.length() > 0) {
                             JSONObject obj = jsonArray.getJSONObject(0);
-                            UserLogged = new User();
+                            UserLogged = fillUser(obj.toString());
 
+                            /*
+                            UserLogged = new User();
                             UserLogged.setMail(obj.getString("Mail"));
                             UserLogged.setCognome(obj.getString("Cognome"));
                             UserLogged.setPassword(obj.getString("Password"));
                             UserLogged.setNome(obj.getString("Nome"));
                             UserLogged.setIndirizzo(obj.getString("Indirizzo"));
                             UserLogged.setNumeroTelefono(obj.getString("NumeroTelefono"));
+
+
+
                             System.out.println("Confermato: " + obj.getString("Confermato"));
                             if(obj.getString("Confermato").equals("0"))
                             {
@@ -381,6 +428,9 @@ public class MainActivity extends AppCompatActivity
                             } else {
                                 UserLogged.setDisabilitato(true);
                             }
+
+                             */
+
                             cartProducts = new Cart();
                             Intent I = new Intent(MainActivity.this, activity_home.class);
                             I.putExtra("Cart", cartProducts);
@@ -403,19 +453,7 @@ public class MainActivity extends AppCompatActivity
         pd.setCancelable(false);
         pd.show();
     }
-    /*
-    private void savePreferences(String NumeroTelefono, String Mail, String Password) {
-        SharedPreferences settings = getSharedPreferences("alPachino",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
 
-        // Edit and commit
-        editor.putString("NumeroTelefono", NumeroTelefono);
-        editor.putString("Mail", Mail);
-        editor.putString("Password", Password);
-        editor.commit();
-    }
-     */
     private void loadPreferences() {
 
         SharedPreferences settings = getSharedPreferences("alPachino",
@@ -425,29 +463,15 @@ public class MainActivity extends AppCompatActivity
         NumeroTelefono = settings.getString("NumeroTelefono", "");
         Mail = settings.getString("Mail", "");
         Password = settings.getString("Password", "");
-    }
 
+        if(Setting.getDebug())
+        {
+            System.out.println("LOADED PREFERENCES");
+            System.out.println("NUMERO TELEFONO: " + NumeroTelefono);
+            System.out.println("MAIL: " + Mail);
+            System.out.println("PASSWORD: " + Password);
 
-    private String downloadJSON(final String urlWebService) {
-
-        try {
-
-            URL url = new URL(urlWebService);
-
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            StringBuilder sb = new StringBuilder();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String json;
-            while ((json = bufferedReader.readLine()) != null) {
-                sb.append(json + "\n");
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            System.out.println(e.toString());
-            return "";
         }
-
     }
 
 

@@ -40,6 +40,7 @@ import com.example.spara.restaurant.object.WebConnection;
 import com.example.spara.restaurant.service.background_alarm;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -56,6 +57,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -178,6 +180,21 @@ public class activity_home extends AppCompatActivity
             startForegroundService(I1);
         else
             startService(I1);
+
+         */
+
+        /*
+        if(Restaurant.getId() == 1) {
+            ConstraintLayout content_main = (ConstraintLayout) findViewById(R.id.content_home);
+            //TextView indirizzo_main = findViewById(R.id.indirizzo_main);
+            //ImageView imgLogo = findViewById(R.id.logo);
+
+            content_main.setBackgroundResource(R.drawable.mi_ndujo);
+            //imgLogo.setImageResource(R.drawable.logo_panino_genuino);
+            //indirizzo_main.setText(Restaurant.getIndirizzo());
+            imgProduct.setImageResource(R.drawable.bisignano);
+            setTitle("Panino Genuino");
+        }
 
          */
 

@@ -255,8 +255,16 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                     Date currentTime = Calendar.getInstance().getTime();
                     SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
                     SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
+                    SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
+
                     String dateStr = date.format(currentTime);
                     String timeStr = time.format(currentTime);
+
+                    String date_time = datetime.format(currentTime);
+
+                    System.out.println(date_time);
+                    System.out.println(currentTime.toString());
+
                     O.setDateTime(currentTime);
                     O.setCosto(cartProducts.getTotalCost());
                     System.out.println("CART COSTO: " + cartProducts.getTotalCost());
@@ -336,11 +344,15 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
             String dateStr = date.format(O.getDateTime());
             String timeStr = time.format(O.getDateTime());
+
+            SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
+            String date_time = datetime.format(O.getDateTime());
+
             System.out.println("UPDATE");
 
             System.out.println(O.getTotaleCosto());
 
-            String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() + "&Costo=" + O.getTotaleCosto() +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&DataOra=" + dateStr +"%20"+ timeStr;
+            String par = "idOrdine=" + O.getId() + "&Stato=" + O.getStato() + "&Asporto=" + O.getAsporto() + "&Costo=" + O.getTotaleCosto() +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&DataOra=" + date_time.replaceAll(" ", "%20");
 
             new Thread(new Runnable() {
                 public void run() {
@@ -364,8 +376,10 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         SimpleDateFormat time = new SimpleDateFormat("HH:mm", Locale.ITALIAN);
         String dateStr = date.format(O.getDateTime());
         String timeStr = time.format(O.getDateTime());
+        SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
+        String date_time = datetime.format(O.getDateTime());
         System.out.println(O.getTotaleCosto());
-        String par = "Asporto=" + O.getAsporto() + "&Pagato=false" +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale=" + UserLogged.getIdLocale() + "&Costo=" + O.getTotaleCosto() ;
+        String par = "Asporto=" + O.getAsporto() + "&Pagato=false" +"&NumeroTelefono=" + UserLogged.getNumeroTelefono() + "&idLocale=" + UserLogged.getIdLocale() + "&Costo=" + O.getTotaleCosto() + "&DataOra="+ date_time.replaceAll(" ", "%20") ;
 
         try {
             idOrderInserted = InsertIntoDBWithId(Connection.getURL(WebConnection.query.INSERTORDER, par));
