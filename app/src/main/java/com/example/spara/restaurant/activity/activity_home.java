@@ -1,13 +1,7 @@
 package com.example.spara.restaurant.activity;
 
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,31 +11,26 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 
 import com.example.spara.restaurant.object.JSONUtility;
 import com.example.spara.restaurant.object.Preference;
 import com.example.spara.restaurant.object.Setting;
-import com.example.spara.restaurant.service.Background;
 import com.example.spara.restaurant.object.Cart;
 import com.example.spara.restaurant.object.Ingredient;
 import com.example.spara.restaurant.object.Product;
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Restaurant;
-import com.example.spara.restaurant.object.ReviewProduct;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.example.spara.restaurant.service.background_alarm;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -58,13 +47,9 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import static com.example.spara.restaurant.object.JSONUtility.fillProductsList;
 
@@ -166,13 +151,13 @@ public class activity_home extends AppCompatActivity
 
         //Background Image
         ImageView imgTransparent = findViewById(R.id.imageView);
-        imgTransparent.setAlpha(230);
+        imgTransparent.setAlpha(200);
 
         //Image and Button declaration
         ImageView imgProduct = findViewById(R.id.imgProdotto);
-        ImageView btnPaniniFritti = findViewById(R.id.Panini_Fritti);
-        ImageView btnPizze = findViewById(R.id.Pizze);
-        ImageView btnSalad = findViewById(R.id.Salad);
+        ImageView btnFritti = findViewById(R.id.Fritti);
+        //ImageView btnPizze = findViewById(R.id.Pizze);
+        ImageView btnPanini = findViewById(R.id.Panini);
         ImageView btnAddCart = findViewById(R.id.addCart);
 
         //Starting background service
@@ -312,7 +297,7 @@ public class activity_home extends AppCompatActivity
         });
 
         //Buttons click event
-        btnPaniniFritti.setOnClickListener(new View.OnClickListener() {
+        btnFritti.setOnClickListener(new View.OnClickListener() {
             //@Override
             public void onClick(View v) {
 
@@ -348,6 +333,7 @@ public class activity_home extends AppCompatActivity
             }
         });
 
+        /*
         btnPizze.setOnClickListener(new View.OnClickListener() {
             //@Override
             public void onClick(View v) {
@@ -382,7 +368,9 @@ public class activity_home extends AppCompatActivity
             }
         });
 
-        btnSalad.setOnClickListener(new View.OnClickListener() {
+         */
+
+        btnPanini.setOnClickListener(new View.OnClickListener() {
             //@Override
             public void onClick(View v) {
 
@@ -493,7 +481,7 @@ public class activity_home extends AppCompatActivity
             }
         });
 
-        btnPizze.callOnClick();
+        btnPanini.callOnClick();
 
     }
 

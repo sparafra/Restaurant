@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity
         TextView Iscriviti = findViewById(R.id.iscriviti);
 
         ImageView imgTransparent = findViewById(R.id.imageView);
-        imgTransparent.setAlpha(230);
+        imgTransparent.setAlpha(200);
 
         ImageView imgLogo = findViewById(R.id.logo);
 

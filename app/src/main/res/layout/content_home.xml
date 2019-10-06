@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/margherita"
+    android:background="@drawable/mi_ndujo"
     android:id="@+id/content_home"
 
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -34,7 +34,7 @@
         app:srcCompat="@drawable/burger" />
 
     <ImageView
-        android:id="@+id/Panini_Fritti"
+        android:id="@+id/Fritti"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginStart="8dp"
@@ -42,27 +42,14 @@
         android:layout_marginEnd="8dp"
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintHorizontal_bias="0.35"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/imgProdotto"
-        app:srcCompat="@drawable/baseline_fastfood_24" />
+        app:srcCompat="@drawable/friesicon" />
+
 
     <ImageView
-        android:id="@+id/Pizze"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:clickable="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.4"
-        app:layout_constraintStart_toStartOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/imgProdotto"
-        app:srcCompat="@drawable/baseline_local_pizza_24" />
-
-    <ImageView
-        android:id="@+id/Salad"
+        android:id="@+id/Panini"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginStart="8dp"
@@ -70,10 +57,9 @@
         android:layout_marginEnd="8dp"
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintHorizontal_bias="0.6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgProdotto"
-        app:srcCompat="@drawable/saladicon" />
+        app:srcCompat="@drawable/hamburgericon" />
 
     <ImageView
         android:id="@+id/addCart"
@@ -84,7 +70,7 @@
         android:layout_marginEnd="8dp"
         android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintHorizontal_bias="0.65"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/imgProdotto"
         app:srcCompat="@drawable/baseline_add_shopping_cart_24" />
@@ -114,6 +100,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Panini_Fritti" />
+        app:layout_constraintTop_toBottomOf="@+id/Fritti" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
