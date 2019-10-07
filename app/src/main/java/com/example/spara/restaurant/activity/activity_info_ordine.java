@@ -98,6 +98,7 @@ public class activity_info_ordine extends AppCompatActivity
     ImageView deleteOrder;
 
     SwitchMultiButton status;
+    boolean refreshSwitch = true;
 
     int posSelected = -1;
 
@@ -180,52 +181,57 @@ public class activity_info_ordine extends AppCompatActivity
             @Override
             public void onSwitch(int position, String tabText) {
 
-                if(Setting.getDebug())
+                if (Setting.getDebug())
                     System.out.println("CHANGING STATUS ORDER");
 
-                showLoadingDialog();
-                new Thread(new Runnable() {
-                    public void run() {
-                        String status="";
-                        switch (tabText)
-                        {
-                            case "Richiesto":
-                                O.setStato("Richiesto");
-                                status = "Richiesto";
-                                break;
-                            case "In Preparazione":
-                                O.setStato("In Preparazione");
-                                status = "In%20Preparazione";
-                                break;
-                            case "In Consegna":
-                                O.setStato("In Consegna");
-                                status = "In%20Consegna";
-                                break;
-                            case "Consegnato":
-                                O.setStato("Consegnato");
-                                status = "Consegnato";
-                                break;
-                            default:
-                                status="";
-                        }
-
-
-                        SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
-                        String date_time = datetime.format(O.getDateTime());
-
-                        String par = "idOrdine=" + O.getId() + "&Stato=" + status + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + date_time.replaceAll(" ", "%20") + "&Costo=" + O.getTotaleCosto();
-
-                        new Thread(new Runnable() {
-                            public void run() {
-                                InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
-
-                                refreshInfoOrder(O.getId());
+                if (refreshSwitch) {
+                    showLoadingDialog();
+                    new Thread(new Runnable() {
+                        public void run() {
+                            String status = "";
+                            switch (tabText) {
+                                case "Richiesto":
+                                    O.setStato("Richiesto");
+                                    status = "Richiesto";
+                                    break;
+                                case "In Preparazione":
+                                    O.setStato("In Preparazione");
+                                    status = "In%20Preparazione";
+                                    break;
+                                case "In Consegna":
+                                    O.setStato("In Consegna");
+                                    status = "In%20Consegna";
+                                    break;
+                                case "Consegnato":
+                                    O.setStato("Consegnato");
+                                    status = "Consegnato";
+                                    break;
+                                default:
+                                    status = "";
                             }
-                        }).start();
-                    }
-                }).start();
 
+
+                            SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
+                            String date_time = datetime.format(O.getDateTime());
+
+                            String par = "idOrdine=" + O.getId() + "&Stato=" + status + "&Asporto=" + O.getAsporto() + "&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + date_time.replaceAll(" ", "%20") + "&Costo=" + O.getTotaleCosto();
+
+                            new Thread(new Runnable() {
+                                public void run() {
+                                    InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
+
+                                    refreshInfoOrder(O.getId());
+                                }
+                            }).start();
+                        }
+                    }).start();
+
+                }
+                else
+                    refreshSwitch = true;
             }
+
+
         });
 
 
@@ -339,6 +345,7 @@ public class activity_info_ordine extends AppCompatActivity
                     public void run() {
                         // Stuff that updates the UI
                         loadIntoProductListView(O.getListProducts());
+                        refreshSwitch = false;
                         Domicilio.setOn(O.getAsporto());
 
                         Nominativo.setText(U.getNome() + " " + U.getCognome());
