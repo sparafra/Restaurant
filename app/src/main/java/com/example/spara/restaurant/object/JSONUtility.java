@@ -324,4 +324,29 @@ public class JSONUtility {
         return list;
 
     }
+
+    public static ArrayList<Restaurant> fillRestaurants(String json)
+    {
+        try {
+            ArrayList<Restaurant> list = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(json);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+
+                Restaurant R = new Restaurant();
+                //R.setAttivo(obj.getBoolean("Active"));
+                R.setId(obj.getLong("id"));
+                R.setIndirizzo(obj.getString("Address"));
+                R.setMail(obj.getString("Mail"));
+                R.setNome(obj.getString("Name"));
+                R.setNumeroTelefono(obj.getString("Telephone"));
+                R.setLogoURL(obj.getString("LogoURL"));
+
+                list.add(R);
+            }
+            return list;
+
+        }
+        catch (Exception e){e.printStackTrace(); return null;}
+    }
 }

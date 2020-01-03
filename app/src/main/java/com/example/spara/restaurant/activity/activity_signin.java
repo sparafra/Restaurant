@@ -54,6 +54,7 @@ public class activity_signin extends AppCompatActivity
     Cart cartProducts;
     User UserLogged;
     WebConnection Connection;
+    Restaurant Rest;
 
 
     ProgressDialog pd;
@@ -125,6 +126,8 @@ public class activity_signin extends AppCompatActivity
         ImageView imgTransparent = findViewById(R.id.imageView);
         imgTransparent.setAlpha(230);
 
+        Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
+
 
         signin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -156,7 +159,7 @@ public class activity_signin extends AppCompatActivity
                                 IndirizzoCompleto = IndirizzoCompleto.replaceAll(" ", "%20");
                                 if(Setting.getDebug())
                                     System.out.println("INITIALIZE USER");
-                                User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, Restaurant.getId(), false);
+                                User U = new User(numeroTelefono, nome, cognome, mail, IndirizzoCompleto, password, false, false, Rest.getId(), false);
 
                                 String par = "NumeroTelefono=" + U.getNumeroTelefono();
                                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
@@ -614,7 +617,7 @@ public class activity_signin extends AppCompatActivity
                 }
             } else {
                 // Permission has already been granted
-                callPhone(Restaurant.getNumeroTelefono());
+                callPhone(Rest.getNumeroTelefono());
 
             }
         }
@@ -633,7 +636,7 @@ public class activity_signin extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    callPhone(Restaurant.getNumeroTelefono());
+                    callPhone(Rest.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.

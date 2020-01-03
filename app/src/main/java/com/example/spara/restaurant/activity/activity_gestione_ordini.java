@@ -67,6 +67,7 @@ public class activity_gestione_ordini extends AppCompatActivity
     Cart cartProducts;
     User UserLogged;
     WebConnection Connection;
+    Restaurant Rest;
 
     ProgressDialog pd;
 
@@ -126,6 +127,7 @@ public class activity_gestione_ordini extends AppCompatActivity
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
         UserLogged = (User) getIntent().getParcelableExtra("User");
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
+        Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
 
 
         if(UserLogged.getAmministratore())
@@ -136,7 +138,7 @@ public class activity_gestione_ordini extends AppCompatActivity
         }
 
 
-        String par = "idLocale=" + Restaurant.getId() + "&Stato=Richiesto";
+        String par = "idLocale=" + Rest.getId() + "&Stato=Richiesto";
         showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
@@ -201,19 +203,19 @@ public class activity_gestione_ordini extends AppCompatActivity
                 switch (tabText)
                 {
                     case "Richiesto":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=Richiesto";
+                        par = "idLocale=" + Rest.getId() + "&Stato=Richiesto";
                         break;
                     case "In Preparazione":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=In%20Preparazione";
+                        par = "idLocale=" + Rest.getId() + "&Stato=In%20Preparazione";
                         break;
                     case "In Consegna":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=In%20Consegna";
+                        par = "idLocale=" + Rest.getId() + "&Stato=In%20Consegna";
                         break;
                     case "Consegnato":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=Consegnato";
+                        par = "idLocale=" + Rest.getId() + "&Stato=Consegnato";
                         break;
                     case "Tutto":
-                        par = "idLocale=" + Restaurant.getId() + "&Stato=all";
+                        par = "idLocale=" + Rest.getId() + "&Stato=all";
                         break;
                     default:
                         par="";
@@ -325,6 +327,8 @@ public class activity_gestione_ordini extends AppCompatActivity
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_gestione_ordini.this.finish();
         }
@@ -334,6 +338,8 @@ public class activity_gestione_ordini extends AppCompatActivity
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_gestione_ordini.this.finish();
         }
@@ -343,6 +349,8 @@ public class activity_gestione_ordini extends AppCompatActivity
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_gestione_ordini.this.finish();
         }
@@ -352,6 +360,8 @@ public class activity_gestione_ordini extends AppCompatActivity
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_gestione_ordini.this.finish();
         }
@@ -385,7 +395,7 @@ public class activity_gestione_ordini extends AppCompatActivity
                 }
             } else {
                 // Permission has already been granted
-                callPhone(Restaurant.getNumeroTelefono());
+                callPhone(Rest.getNumeroTelefono());
             }
         }
         else if (id == R.id.nav_exit)
@@ -409,7 +419,7 @@ public class activity_gestione_ordini extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    callPhone(Restaurant.getNumeroTelefono());
+                    callPhone(Rest.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.

@@ -10,7 +10,7 @@ public class WebConnection extends Thread implements Parcelable  {
     public enum query {
         LISTACCOUNTS, INGREDIENTS, ORDERPRODUCTSUSER, BURGERFRIESINGREDIENTS, PIZZEINGREDIENTS, PRODUCTSINGREDIENTS, SALADSINGREDIENTS, INSERTUSER, INSERTORDER, INSERTORDERPRODUCT, INSERTPRODUCT,
         INSERTPRODUCTTIPOLOGY, INSERTPRODUCTINGREDIENT, UPDATEORDER, NOTICE, NOTICESTATEUPDATE, PRODUCTIMAGE, SEARCHACCOUNT, ORDERPRODUCTSUSERSTATE,
-        ORDER, ADMINLIST, INSERTLOCALUSER, INSERTNOTICE, SEARCHACCOUNTBYID, UPDATEORDERPRODUCT, DELETEORDERPRODUCT, DELETEORDER
+        ORDER, ADMINLIST, INSERTLOCALUSER, INSERTNOTICE, SEARCHACCOUNTBYID, UPDATEORDERPRODUCT, DELETEORDERPRODUCT, DELETEORDER, ALLLOCALS
     }
 
     public  WebConnection(){ }
@@ -77,7 +77,18 @@ public class WebConnection extends Thread implements Parcelable  {
                 return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/DeleteOrderProduct?" + parameters;
             case DELETEORDER:
                 return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/DeleteOrder?" + parameters;
-
+            case LISTACCOUNTS:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllUsers?idLocale=" + parameters;
+            case INGREDIENTS:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllIngredients?idLocale=" + parameters;
+            case BURGERFRIESINGREDIENTS:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Fritti&idLocale=" + parameters;
+            case PIZZEINGREDIENTS:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Pizza&idLocale=" + parameters;
+            case PRODUCTSINGREDIENTS:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllProducts?idLocale=" + parameters;
+            case SALADSINGREDIENTS:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Panino&idLocale=" +parameters;
             default:
                 return "";
         }
@@ -85,18 +96,9 @@ public class WebConnection extends Thread implements Parcelable  {
     public String getURL(query Q)
     {
         switch(Q) {
-            case LISTACCOUNTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllUsers?idLocale=" + Restaurant.id;
-            case INGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllIngredients?idLocale=" + Restaurant.id;
-            case BURGERFRIESINGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Fritti&idLocale=" + Restaurant.id;
-            case PIZZEINGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Pizza&idLocale=" + Restaurant.id;
-            case PRODUCTSINGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/AllProducts?idLocale=" + Restaurant.id;
-            case SALADSINGREDIENTS:
-                return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/ProductsByType?Type=Panino&idLocale=" + Restaurant.id;
+
+            case ALLLOCALS:
+                return "http://" + ipWebServer + ":8080/Restaurant/servlet/AllLocals";
             default:
                 return "";
         }

@@ -47,6 +47,7 @@ public class activity_map extends AppCompatActivity
     Cart cartProducts;
     User UserLogged;
     WebConnection Connection;
+    Restaurant Rest;
 
     ProgressDialog pd;
 
@@ -85,6 +86,7 @@ public class activity_map extends AppCompatActivity
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
         UserLogged = (User) getIntent().getParcelableExtra("User");
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
+        Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
 
         ImageView imgTransparent = findViewById(R.id.imageView);
         imgTransparent.setAlpha(230);
@@ -160,6 +162,8 @@ public class activity_map extends AppCompatActivity
                 I.putExtra("Cart", cartProducts);
                 I.putExtra("User", UserLogged);
                 I.putExtra("WebConnection", Connection);
+                I.putExtra("Restaurant" ,Rest);
+
                 startActivity(I);
                 activity_map.this.finish();
             }
@@ -177,6 +181,8 @@ public class activity_map extends AppCompatActivity
                 I.putExtra("Cart", cartProducts);
                 I.putExtra("User", UserLogged);
                 I.putExtra("WebConnection", Connection);
+                I.putExtra("Restaurant" ,Rest);
+
                 startActivity(I);
                 activity_map.this.finish();
             }
@@ -189,6 +195,8 @@ public class activity_map extends AppCompatActivity
                 I.putExtra("Cart", cartProducts);
                 I.putExtra("User", UserLogged);
                 I.putExtra("WebConnection", Connection);
+                I.putExtra("Restaurant" ,Rest);
+
                 startActivity(I);
                 activity_map.this.finish();
             }
@@ -234,7 +242,7 @@ public class activity_map extends AppCompatActivity
                 }
             } else {
                 // Permission has already been granted
-                callPhone(Restaurant.getNumeroTelefono());
+                callPhone(Rest.getNumeroTelefono());
 
             }
         }
@@ -267,7 +275,7 @@ public class activity_map extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    callPhone(Restaurant.getNumeroTelefono());
+                    callPhone(Rest.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.

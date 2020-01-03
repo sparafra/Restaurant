@@ -71,6 +71,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
     Cart cartProducts;
     User UserLogged;
     WebConnection Connection;
+    Restaurant Rest;
 
     ListView list;
     int posSelected = -1;
@@ -129,6 +130,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         cartProducts = (Cart) getIntent().getParcelableExtra("Cart");
         UserLogged = (User) getIntent().getParcelableExtra("User");
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
+        Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
 
         if(UserLogged.getAmministratore())
         {
@@ -290,7 +292,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                                 if(Setting.getDebug())
                                     System.out.println("SEND NOTICE TO ALL ADMIN");
 
-                                String par = "idLocale=" + Restaurant.getId() + "&Amministratore=true";
+                                String par = "idLocale=" + Rest.getId() + "&Amministratore=true";
                                 String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.ADMINLIST, par));
                                 List<User> AdminUsers = JSONUtility.fillUsers(tmpJSON);
 
@@ -303,7 +305,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                                     N.setStato(false);
                                     N.setRicevutoDa(AdminUsers.get(k).getNumeroTelefono());
                                     N.setMessaggio("Ricevuto nuovo ordine con id: " + O.getId());
-                                    N.setIdLocale(Restaurant.getId());
+                                    N.setIdLocale(Rest.getId());
                                     N.setCreatoDa(O.getNumeroTelefono());
                                     N.setTitolo("Nuovo Ordine");
                                     N.setTipo("new_order");
@@ -408,7 +410,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                 if(Setting.getDebug())
                     System.out.println("INSERT CUSTOM PRODUCT FOR ORDER: " + O.getId());
 
-                par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&Tipo=" + O.getListProducts().get(k).getTipo() +"&idLocale=" + Restaurant.getId() + "&ImageURL="+ O.getListProducts().get(k).getImageURL() ;
+                par = "Nome=" + O.getListProducts().get(k).getNome() + "&Prezzo=" + O.getListProducts().get(k).getPrezzo() + "&Tipo=" + O.getListProducts().get(k).getTipo() +"&idLocale=" + Rest.getId() + "&ImageURL="+ O.getListProducts().get(k).getImageURL() ;
                 idProductEdited = InsertIntoDBWithId(Connection.getURL(WebConnection.query.INSERTPRODUCT, par));
 
                 for(int i=0; i<O.getListProducts().get(k).getListIngredienti().size(); i++)
@@ -566,6 +568,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
             startActivity(I);
             activity_carrello.this.finish();
         }
@@ -575,6 +578,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_carrello.this.finish();
         }
@@ -584,6 +589,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_carrello.this.finish();
         }
@@ -597,6 +604,8 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_carrello.this.finish();
         }
@@ -630,7 +639,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                 }
             } else {
                 // Permission has already been granted
-                callPhone(Restaurant.getNumeroTelefono());
+                callPhone(Rest.getNumeroTelefono());
 
             }
         }
@@ -655,7 +664,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    callPhone(Restaurant.getNumeroTelefono());
+                    callPhone(Rest.getNumeroTelefono());
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.

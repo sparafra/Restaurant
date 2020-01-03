@@ -11,14 +11,29 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.custom_adapter.SlideAdapter;
 import com.example.spara.restaurant.object.Cart;
 import com.example.spara.restaurant.object.JSONUtility;
 import com.example.spara.restaurant.object.Preference;
@@ -28,35 +43,16 @@ import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.ArrayList;
 
 import static com.example.spara.restaurant.object.JSONUtility.downloadJSON;
+import static com.example.spara.restaurant.object.JSONUtility.fillRestaurants;
 import static com.example.spara.restaurant.object.JSONUtility.fillUser;
 
-public class MainActivity extends AppCompatActivity
+public class activity_slider extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
 
@@ -74,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_slider);
 
         if(Setting.getDebug())
             System.out.println("onCreate");
@@ -95,6 +91,7 @@ public class MainActivity extends AppCompatActivity
         });
         */
 
+        /*
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -103,10 +100,10 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        */
 
         //MY CODE
         Connection = new WebConnection();
-        Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
@@ -139,212 +136,58 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-
-        Button login = findViewById(R.id.login);
-
-
-        TextView t1 = findViewById(R.id.indirizzo_main);
-        Typeface typeface = Typeface.createFromAsset(getAssets(),"font/robotoregular.ttf");
-        t1.setTypeface(typeface);
-
-        TextView Iscriviti = findViewById(R.id.iscriviti);
-
-        ImageView imgTransparent = findViewById(R.id.imageView);
-        imgTransparent.setAlpha(200);
-
-        ImageView imgLogo = findViewById(R.id.logo);
-
         /*
-        if(Restaurant.getId() == 1) {
-            ConstraintLayout content_main = (ConstraintLayout) findViewById(R.id.content_main);
-            TextView indirizzo_main = findViewById(R.id.indirizzo_main);
+        new Thread(new Runnable() {
+            public void run() {
 
-            content_main.setBackgroundResource(R.drawable.mi_ndujo);
-            imgLogo.setImageResource(R.drawable.logo_panino_genuino);
-            indirizzo_main.setText(Restaurant.getIndirizzo());
+                if(Setting.getDebug())
+                {
+                    System.out.println("NUMERO TELEFONO: " + NumeroTelefono);
+                    System.out.println("MAIL: " + Mail);
+                    System.out.println("PASSWORD: " + Password);
+                }
 
-            setTitle("Panino Genuino");
-        }
+
+
+                try{
+                    String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ALLLOCALS));
+                    ArrayList<Restaurant> listRestaurant = fillRestaurants(tmpJSON);
+
+
+                }catch (Exception e){}
+
+            }
+        }).start();
 
          */
+        String[] listURL_images;
+        String[] lst_title;
+        String[] lst_description;
 
-        TextView txtMail = findViewById(R.id.mail);
-        TextView txtPassword = findViewById(R.id.password);
+        try{
+            String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ALLLOCALS));
+            ArrayList<Restaurant> listRestaurant = fillRestaurants(tmpJSON);
+            listURL_images = new String[listRestaurant.size()];
+            lst_title = new String[listRestaurant.size()];
+            lst_description = new String[listRestaurant.size()];
 
-
-
-        login.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Code here executes on main thread after user presses button
-
-                String mail = txtMail.getText().toString();
-                String password = txtPassword.getText().toString();
-                new Thread(new Runnable() {
-                    public void run() {
-                        try {
-                            String par = "idLocale=" + Rest.getId() + "&Mail=" + mail;
-                            String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
-                            if(Setting.getDebug())
-                            {
-                                System.out.println("URL SEARCH ACCOUNT: " + Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
-                                System.out.println("JSON RESULT" + tmpJSON);
-                            }
-
-                            JSONArray jsonArray = new JSONArray(tmpJSON);
-                            if (jsonArray.length() > 0) {
-                                JSONObject obj = jsonArray.getJSONObject(0);
-
-                                UserLogged = JSONUtility.fillUser(obj.toString());
-                                if(Setting.getDebug())
-                                    System.out.println("USER LOGGED: " + UserLogged.getNumeroTelefono() + ", NOMINATIVO= " + UserLogged.getCognome() + ", " + UserLogged.getNome());
-
-                                if(Setting.getDebug()) {
-                                    if(UserLogged.getPassword().equals(txtPassword.getText().toString()))
-                                        System.out.println("PASSWORD MATCHED");
-                                    else {
-                                        System.out.println("PASSWORD NOT EQUALS");
-                                        System.out.println("PASSWORD INPUT: " + txtPassword.getText().toString());
-                                        System.out.println("PASSWORD CORRECT: " + UserLogged.getPassword());
-                                    }
-                                }
-
-
-                                if(UserLogged.getPassword().equals(password.trim()) && UserLogged.getConfermato() == true && UserLogged.getDisabilitato() == false) {
-
-                                    Preference.savePreferences(UserLogged.getNumeroTelefono(), UserLogged.getMail(), UserLogged.getPassword(), MainActivity.this);
-                                    cartProducts = new Cart();
-
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            // Stuff that updates the UI
-                                            Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                                            animation1.setDuration(1000);
-                                            v.startAnimation(animation1);
-                                        }
-                                    });
-
-                                    Intent I = new Intent(MainActivity.this, activity_home.class);
-                                    I.putExtra("Cart", cartProducts);
-                                    I.putExtra("User", UserLogged);
-                                    I.putExtra("WebConnection", Connection);
-                                    startActivity(I);
-                                    MainActivity.this.finish();
-                                }
-                                else{
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            // Stuff that updates the UI
-                                            Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                                            animation1.setDuration(1000);
-                                            v.startAnimation(animation1);
-                                            if(!UserLogged.getPassword().equals(password.trim())) {
-                                                Toast.makeText(getApplicationContext(), "Mail e/o Password non corretta", Toast.LENGTH_SHORT).show();
-                                            }
-                                            else if(!UserLogged.getConfermato())
-                                            {
-                                                Toast.makeText(getApplicationContext(), "Utente non confermato, controlla la mail ricevuta", Toast.LENGTH_SHORT).show();
-                                            }
-                                            else if(UserLogged.getDisabilitato())
-                                            {
-                                                Toast.makeText(getApplicationContext(), "Utente disabilitato", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
-                                }
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Stuff that updates the UI
-                                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                                        animation1.setDuration(1000);
-                                        v.startAnimation(animation1);
-                                        Toast.makeText(getApplicationContext(), "Utente non trovato", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(), "Login non riuscito", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                }).start();
-
+            for(int k=0; k<listRestaurant.size(); k++)
+            {
+                listURL_images[k] = listRestaurant.get(k).getLogoURL();
+                lst_title[k] = listRestaurant.get(k).getNome();
+                lst_description[k] = listRestaurant.get(k).getIndirizzo();
             }
-        });
 
-        Iscriviti.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Code here executes on main thread after user presses button
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Stuff that updates the UI
-                        Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
-                        animation1.setDuration(1000);
-                        v.startAnimation(animation1);
-                    }
-                });
-                Intent I = new Intent(MainActivity.this, activity_signin.class);
-                startActivity(I);
-                MainActivity.this.finish();
+            ViewPager viewPager;
+            SlideAdapter myadapter;
+            viewPager = (ViewPager) findViewById(R.id.viewpager);
+            myadapter = new SlideAdapter(this, listURL_images, lst_title, lst_description);
+            viewPager.setAdapter(myadapter);
 
-            }
-        });
+        }catch (Exception e){}
 
-        txtMail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!txtMail.getText().toString().equals("") && txtMail.getText().toString().equals(getString(R.string.SampleMail))) {
-                    txtMail.setText("");
-                    txtMail.setTextColor(Color.WHITE);
-                }
-                if (!hasFocus) {
-                    if(txtMail.getText().toString().equals(""))
-                    {
-                        txtMail.setText(getString(R.string.SampleMail));
-                        txtMail.setTextColor(Color.WHITE);
-                    }
-                }
-                else{
-                    txtMail.setTextColor(Color.WHITE);
-                }
 
-            }
-        });
-        txtPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(!txtPassword.getText().toString().equals("") && txtPassword.getText().toString().equals(getString(R.string.SamplePassword))) {
-                    txtPassword.setText("");
-                    txtPassword.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-                    txtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    txtPassword.setTextColor(Color.WHITE);
-                }
-                if (!hasFocus) {
-                    if(txtPassword.getText().toString().equals(""))
-                    {
-                        txtPassword.setTransformationMethod(null);
-                        txtPassword.setText(getString(R.string.SamplePassword));
-                        txtPassword.setTextColor(Color.WHITE);
-                    }
-                }
-                else
-                {
-                    txtPassword.setTextColor(Color.WHITE);
-                }
-
-            }
-        });
     }
     @Override
     protected void onStart()
@@ -353,8 +196,9 @@ public class MainActivity extends AppCompatActivity
         if(Setting.getDebug())
             System.out.println("onStart");
 
-
+        /*
         showLoadingDialog();
+
         new Thread(new Runnable() {
             public void run() {
 
@@ -370,7 +214,7 @@ public class MainActivity extends AppCompatActivity
                 if(!NumeroTelefono.equals("") && !Mail.equals("") && !Password.equals(""))
                 {
                     try{
-                        String par = "idLocale=" + Rest.getId() + "&Mail=" + Mail;
+                        String par = "idLocale=" + Restaurant.getId() + "&Mail=" + Mail;
                         String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNT, par));
                         JSONArray jsonArray = new JSONArray(tmpJSON);
                         if (jsonArray.length() > 0) {
@@ -378,19 +222,21 @@ public class MainActivity extends AppCompatActivity
                             UserLogged = fillUser(obj.toString());
 
                             cartProducts = new Cart();
-                            Intent I = new Intent(MainActivity.this, activity_home.class);
+                            Intent I = new Intent(activity_slider.this, activity_home.class);
                             I.putExtra("Cart", cartProducts);
                             I.putExtra("User", UserLogged);
                             I.putExtra("WebConnection", Connection);
                             pd.dismiss();
                             startActivity(I);
-                            MainActivity.this.finish();
+                            activity_slider.this.finish();
                         }
                     }catch (Exception e){UserLogged = new User();}
                 }
                 pd.dismiss();
             }
         }).start();
+
+         */
     }
     private void showLoadingDialog() {
         pd = new ProgressDialog(this, R.style.DialogTheme);
@@ -470,14 +316,12 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "Devi effettuare prima il login o registrarti!", Toast.LENGTH_SHORT).show();
 
         } else if (id == R.id.nav_map) {
-            Intent I = new Intent(MainActivity.this, activity_map.class);
+            Intent I = new Intent(activity_slider.this, activity_map.class);
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
-            I.putExtra("Restaurant" ,Rest);
-
             startActivity(I);
-            MainActivity.this.finish();
+            activity_slider.this.finish();
         } else if (id == R.id.nav_account) {
             Toast.makeText(getApplicationContext(), "Devi effettuare prima il login o registrarti!", Toast.LENGTH_SHORT).show();
 
