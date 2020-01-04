@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -31,6 +32,7 @@ import com.example.spara.restaurant.object.WebConnection;
 import com.example.spara.restaurant.service.background_alarm;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -199,7 +201,20 @@ public class activity_home extends AppCompatActivity
         }
 
          */
+        ConstraintLayout layoutslide = (ConstraintLayout) findViewById(R.id.content_home);
 
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL()));
+                    layoutslide.setBackground(new BitmapDrawable(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL())).get()));
+                    //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+                    //layoutslide.setAlpha((float)0.2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
 
 
@@ -322,7 +337,7 @@ public class activity_home extends AppCompatActivity
                     public void run() {
                         if(Setting.getDebug())
                             System.out.println("FILTER PANINI");
-                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.BURGERFRIESINGREDIENTS));
+                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.BURGERFRIESINGREDIENTS, Rest.getId().toString()));
                         listProducts = fillProductsList(tmpJSON);
                         runOnUiThread(new Runnable() {
                             @Override
@@ -392,9 +407,11 @@ public class activity_home extends AppCompatActivity
                 showLoadingDialog();
                 new Thread(new Runnable() {
                     public void run() {
-                        if(Setting.getDebug())
+                        if(Setting.getDebug()) {
                             System.out.println("FILTER SALAD");
-                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.SALADSINGREDIENTS));
+                            System.out.println(Connection.getURL(WebConnection.query.SALADSINGREDIENTS, Rest.getId().toString()));
+                        }
+                        String tmpJSON = JSONUtility.downloadJSON(Connection.getURL(WebConnection.query.SALADSINGREDIENTS, Rest.getId().toString()));
                         listProducts = fillProductsList(tmpJSON);
                         runOnUiThread(new Runnable() {
 

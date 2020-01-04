@@ -7,7 +7,9 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@drawable/margherita"
     tools:context=".activity.activity_info_ordine"
-    tools:showIn="@layout/app_bar_info_ordine">
+    tools:showIn="@layout/app_bar_info_ordine"
+    android:id="@+id/content_info_ordini">
+
 
 
     <ImageView

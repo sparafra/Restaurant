@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -26,6 +27,7 @@ import com.example.spara.restaurant.object.WebConnection;
 import com.example.spara.restaurant.custom_adapter.customAdapter_carrello;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
@@ -131,6 +133,21 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         UserLogged = (User) getIntent().getParcelableExtra("User");
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
         Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
+
+        ConstraintLayout layoutslide = (ConstraintLayout) findViewById(R.id.content_carrello);
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL()));
+                    layoutslide.setBackground(new BitmapDrawable(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL())).get()));
+                    //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+                    //layoutslide.setAlpha((float)0.2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
         if(UserLogged.getAmministratore())
         {

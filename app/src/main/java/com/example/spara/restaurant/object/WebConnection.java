@@ -62,7 +62,7 @@ public class WebConnection extends Thread implements Parcelable  {
             case NOTICESTATEUPDATE:
                 return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/UpdateNotice?" + parameters;
             case PRODUCTIMAGE:
-                return "http://" + ipWebServer + ":8080/Restaurant/" + parameters;
+                return "http://" + ipWebServer + ":8080/Restaurant/" + parameters.replaceAll(" ", "%20");
             case SEARCHACCOUNT:
                 return "http://" + ipWebServer + ":8080/Restaurant/servlet/app/UserByMail?" + parameters;
             case SEARCHACCOUNTBYID:

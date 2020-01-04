@@ -38,7 +38,8 @@ public class Restaurant implements Parcelable{
 
     }
     public void writeToParcel(Parcel out, int flags) {
-        out.writeString(String.valueOf(id));
+        out.writeLong(id);
+        //out.writeString(String.valueOf(id));
         out.writeString(Nome);
         out.writeString(Indirizzo);
         out.writeString(NumeroTelefono);

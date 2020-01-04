@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -17,6 +18,7 @@ import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -44,6 +46,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import com.example.spara.restaurant.object.Restaurant;
+import com.squareup.picasso.Picasso;
 
 import static com.example.spara.restaurant.object.JSONUtility.downloadJSON;
 
@@ -127,6 +130,21 @@ public class activity_signin extends AppCompatActivity
         imgTransparent.setAlpha(230);
 
         Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
+
+        ConstraintLayout layoutslide = (ConstraintLayout) findViewById(R.id.content_signin);
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL()));
+                    layoutslide.setBackground(new BitmapDrawable(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL())).get()));
+                    //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+                    //layoutslide.setAlpha((float)0.2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
 
         signin.setOnClickListener(new View.OnClickListener() {

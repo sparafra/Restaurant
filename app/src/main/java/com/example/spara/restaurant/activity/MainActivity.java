@@ -8,8 +8,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.StrictMode;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -27,6 +29,7 @@ import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
+import com.squareup.picasso.Picasso;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         if(Setting.getDebug())
             System.out.println("onCreate");
 
@@ -107,6 +111,20 @@ public class MainActivity extends AppCompatActivity
         //MY CODE
         Connection = new WebConnection();
         Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
+
+        if(Setting.getDebug())
+        {
+            System.out.println("ID: " + Rest.getId());
+            System.out.println("Attivo:_" + Rest.getAttivo());
+            System.out.println("Indirizzo: " + Rest.getIndirizzo());
+            System.out.println("Mail: " + Rest.getMail());
+            System.out.println("Nome: " + Rest.getNome());
+            System.out.println("NumeroTelefono: " + Rest.getNumeroTelefono());
+
+        }
+
+
+
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
@@ -148,11 +166,29 @@ public class MainActivity extends AppCompatActivity
         t1.setTypeface(typeface);
 
         TextView Iscriviti = findViewById(R.id.iscriviti);
+        ConstraintLayout layoutslide = (ConstraintLayout) findViewById(R.id.content_main);
 
         ImageView imgTransparent = findViewById(R.id.imageView);
         imgTransparent.setAlpha(200);
 
         ImageView imgLogo = findViewById(R.id.logo);
+
+        Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE,Rest.getLogoURL())).into(imgLogo);
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL()));
+                    layoutslide.setBackground(new BitmapDrawable(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL())).get()));
+                    //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+                    //layoutslide.setAlpha((float)0.2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+
 
         /*
         if(Restaurant.getId() == 1) {
@@ -228,6 +264,7 @@ public class MainActivity extends AppCompatActivity
                                     I.putExtra("Cart", cartProducts);
                                     I.putExtra("User", UserLogged);
                                     I.putExtra("WebConnection", Connection);
+                                    I.putExtra("Restaurant", Rest);
                                     startActivity(I);
                                     MainActivity.this.finish();
                                 }
@@ -382,6 +419,8 @@ public class MainActivity extends AppCompatActivity
                             I.putExtra("Cart", cartProducts);
                             I.putExtra("User", UserLogged);
                             I.putExtra("WebConnection", Connection);
+                            I.putExtra("Restaurant", Rest);
+
                             pd.dismiss();
                             startActivity(I);
                             MainActivity.this.finish();

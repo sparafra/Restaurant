@@ -2,6 +2,7 @@ package com.example.spara.restaurant.custom_adapter;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
@@ -20,7 +21,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.activity.MainActivity;
+import com.example.spara.restaurant.activity.activity_carrello;
+import com.example.spara.restaurant.activity.activity_home;
+import com.example.spara.restaurant.activity.activity_slider;
 import com.example.spara.restaurant.object.JSONUtility;
+import com.example.spara.restaurant.object.Restaurant;
 import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.WebConnection;
 import com.squareup.picasso.Picasso;
@@ -37,6 +43,8 @@ public class SlideAdapter extends PagerAdapter {
     Context context;
     LayoutInflater inflater;
     WebConnection Connection;
+
+    ArrayList<Restaurant> listRestaurant;
 
     // list of images
     /*
@@ -87,13 +95,14 @@ public class SlideAdapter extends PagerAdapter {
     };
     */
 
-    public SlideAdapter(Context context, String[] listURLimg, String[] listTitle, String[] listDescription, int[] list_background, String[] listBackgroundURL) {
+    public SlideAdapter(Context context, String[] listURLimg, String[] listTitle, String[] listDescription, int[] list_background, String[] listBackgroundURL, ArrayList<Restaurant> listRestaurant) {
         this.context = context;
         this.listURL_images = listURLimg;
         this.lst_title = listTitle;
         this.lst_description = listDescription;
         this.lst_backgroundcolor = list_background;
         this.listBackgroundURL = listBackgroundURL;
+        this.listRestaurant = listRestaurant;
         Connection = new WebConnection();
 
 
@@ -145,13 +154,38 @@ public class SlideAdapter extends PagerAdapter {
         txttitle.setText(lst_title[position]);
         description.setText(lst_description[position]);
 
+        layoutslide.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+
+                Intent I = new Intent(context, MainActivity.class);
+                I.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); //add this line
+
+                I.putExtra("WebConnection" ,Connection);
+                I.putExtra("Restaurant" , listRestaurant.get(position));
+
+                context.startActivity(I);
+                //context.this.finish();
+
+
+                new Thread(new Runnable() {
+                    public void run() {
+                        if(Setting.getDebug())
+                            System.out.println("FILTER PANINI");
+
+                    }
+                }).start();
+
+            }
+        });
+
         container.addView(view);
         return view;
     }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView((LinearLayout)object);
+        container.removeView((ConstraintLayout)object);
     }
 
     public void setURLImages(String[] list){listURL_images = list;}

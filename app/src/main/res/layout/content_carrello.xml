@@ -7,10 +7,12 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@drawable/margherita"
     tools:context=".activity.activity_carrello"
-    tools:showIn="@layout/app_bar_carrello">
+    tools:showIn="@layout/app_bar_carrello"
+    android:id="@+id/content_carrello">
 
 
-    <ImageView
+
+<ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

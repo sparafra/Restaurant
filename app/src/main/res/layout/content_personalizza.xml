@@ -7,10 +7,11 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@drawable/margherita"
     tools:context=".activity.activity_personalizza"
-    tools:showIn="@layout/app_bar_personalizza">
+    tools:showIn="@layout/app_bar_personalizza"
+    android:id="@+id/content_personalizza">
 
 
-    <ImageView
+<ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

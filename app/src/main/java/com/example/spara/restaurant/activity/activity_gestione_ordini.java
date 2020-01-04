@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -21,7 +22,9 @@ import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
+import com.squareup.picasso.Picasso;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -129,6 +132,20 @@ public class activity_gestione_ordini extends AppCompatActivity
         Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
         Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
 
+        ConstraintLayout layoutslide = (ConstraintLayout) findViewById(R.id.content_gestione_ordini);
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL()));
+                    layoutslide.setBackground(new BitmapDrawable(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL())).get()));
+                    //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+                    //layoutslide.setAlpha((float)0.2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
         if(UserLogged.getAmministratore())
         {
@@ -180,6 +197,7 @@ public class activity_gestione_ordini extends AppCompatActivity
                         I.putExtra("Cart", cartProducts);
                         I.putExtra("User", UserLogged);
                         I.putExtra("WebConnection" ,Connection);
+                        I.putExtra("Restaurant" ,Rest);
                         I.putExtra("idOrdine", OrderList.get(position).getId());
                         startActivity(I);
                         activity_gestione_ordini.this.finish();

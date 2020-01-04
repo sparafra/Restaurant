@@ -7,7 +7,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@drawable/margherita"
     tools:context=".activity.activity_signin"
-    tools:showIn="@layout/app_bar_signin">
+    tools:showIn="@layout/app_bar_signin"
+    android:id="@+id/content_signin">
 
 
     <ImageView

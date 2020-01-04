@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -32,7 +33,9 @@ import com.github.angads25.toggle.widget.LabeledSwitch;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.squareup.picasso.Picasso;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -100,6 +103,8 @@ public class activity_info_ordine extends AppCompatActivity
 
     SwitchMultiButton status;
 
+    boolean isRefreshing = false;
+
     int posSelected = -1;
 
     @Override
@@ -166,6 +171,22 @@ public class activity_info_ordine extends AppCompatActivity
         if(Setting.getDebug())
             System.out.println("ORDER ID: " + idOrdine);
 
+        ConstraintLayout layoutslide = (ConstraintLayout) findViewById(R.id.content_info_ordini);
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL()));
+                    layoutslide.setBackground(new BitmapDrawable(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, Rest.getBackgroundURL())).get()));
+                    //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+                    //layoutslide.setAlpha((float)0.2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+
         if(UserLogged.getAmministratore())
         {
             if(Setting.getDebug())
@@ -175,7 +196,6 @@ public class activity_info_ordine extends AppCompatActivity
         //Toast.makeText(getApplicationContext(), UserLogged.getNumeroTelefono(), Toast.LENGTH_SHORT).show();
 
 
-
         showLoadingDialog();
         refreshInfoOrder(idOrdine);
 
@@ -183,51 +203,52 @@ public class activity_info_ordine extends AppCompatActivity
             @Override
             public void onSwitch(int position, String tabText) {
 
-                if(Setting.getDebug())
-                    System.out.println("CHANGING STATUS ORDER");
+                if (isRefreshing) {
+                    if (Setting.getDebug())
+                        System.out.println("CHANGING STATUS ORDER");
 
-                showLoadingDialog();
-                new Thread(new Runnable() {
-                    public void run() {
-                        String status="";
-                        switch (tabText)
-                        {
-                            case "Richiesto":
-                                O.setStato("Richiesto");
-                                status = "Richiesto";
-                                break;
-                            case "In Preparazione":
-                                O.setStato("In Preparazione");
-                                status = "In%20Preparazione";
-                                break;
-                            case "In Consegna":
-                                O.setStato("In Consegna");
-                                status = "In%20Consegna";
-                                break;
-                            case "Consegnato":
-                                O.setStato("Consegnato");
-                                status = "Consegnato";
-                                break;
-                            default:
-                                status="";
-                        }
-
-
-                        SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
-                        String date_time = datetime.format(O.getDateTime());
-
-                        String par = "idOrdine=" + O.getId() + "&Stato=" + status + "&Asporto=" + O.getAsporto() +"&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + date_time.replaceAll(" ", "%20") + "&Costo=" + O.getTotaleCosto();
-
-                        new Thread(new Runnable() {
-                            public void run() {
-                                InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
-
-                                refreshInfoOrder(O.getId());
+                    showLoadingDialog();
+                    new Thread(new Runnable() {
+                        public void run() {
+                            String status = "";
+                            switch (tabText) {
+                                case "Richiesto":
+                                    O.setStato("Richiesto");
+                                    status = "Richiesto";
+                                    break;
+                                case "In Preparazione":
+                                    O.setStato("In Preparazione");
+                                    status = "In%20Preparazione";
+                                    break;
+                                case "In Consegna":
+                                    O.setStato("In Consegna");
+                                    status = "In%20Consegna";
+                                    break;
+                                case "Consegnato":
+                                    O.setStato("Consegnato");
+                                    status = "Consegnato";
+                                    break;
+                                default:
+                                    status = "";
                             }
-                        }).start();
-                    }
-                }).start();
 
+
+                            SimpleDateFormat datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ITALIAN);
+                            String date_time = datetime.format(O.getDateTime());
+
+                            String par = "idOrdine=" + O.getId() + "&Stato=" + status + "&Asporto=" + O.getAsporto() + "&NumeroTelefono=" + O.getNumeroTelefono() + "&DataOra=" + date_time.replaceAll(" ", "%20") + "&Costo=" + O.getTotaleCosto();
+
+                            new Thread(new Runnable() {
+                                public void run() {
+                                    InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
+
+                                    refreshInfoOrder(O.getId());
+                                }
+                            }).start();
+                        }
+                    }).start();
+
+                }
             }
         });
 
@@ -328,10 +349,14 @@ public class activity_info_ordine extends AppCompatActivity
 
     private void refreshInfoOrder(int idOrdine)
     {
+
         new Thread(new Runnable() {
             public void run() {
+                isRefreshing = true;
                 if(Setting.getDebug())
                     System.out.println("REFRESH INFO");
+
+
 
                 String par = "idOrdine=" + idOrdine;
                 String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ORDER, par));
@@ -373,6 +398,7 @@ public class activity_info_ordine extends AppCompatActivity
                     }
                 });
                 pd.dismiss();
+                isRefreshing = false;
             }
         }).start();
     }
@@ -554,6 +580,8 @@ public class activity_info_ordine extends AppCompatActivity
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_info_ordine.this.finish();
         }
@@ -563,6 +591,8 @@ public class activity_info_ordine extends AppCompatActivity
             I.putExtra("Cart", cartProducts);
             I.putExtra("User", UserLogged);
             I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+
             startActivity(I);
             activity_info_ordine.this.finish();
         }

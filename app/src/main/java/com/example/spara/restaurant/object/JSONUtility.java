@@ -335,7 +335,10 @@ public class JSONUtility {
                 System.out.println(obj);
                 Restaurant R = new Restaurant();
                 //R.setAttivo(obj.getBoolean("Active"));
+                System.out.println("FILL: "+ obj.getLong("id"));
                 R.setId(obj.getLong("id"));
+                System.out.println("FILL: "+ R.getId());
+
                 R.setIndirizzo(obj.getString("Address"));
                 R.setMail(obj.getString("Mail"));
                 R.setNome(obj.getString("Name"));

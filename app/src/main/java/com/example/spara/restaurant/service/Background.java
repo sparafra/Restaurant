@@ -20,6 +20,7 @@ import com.example.spara.restaurant.activity.activity_home;
 import com.example.spara.restaurant.activity.activity_info_ordine;
 import com.example.spara.restaurant.object.Cart;
 import com.example.spara.restaurant.object.Notice;
+import com.example.spara.restaurant.object.Restaurant;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 
@@ -39,6 +40,7 @@ public class Background extends Service {
     WebConnection Connection;
     User UserLogged;
     Cart cartProducts;
+    Restaurant Rest;
 
     String UserNumber;
     String Mail;
@@ -194,6 +196,8 @@ public class Background extends Service {
             notificationIntent.putExtra("Cart", cartProducts);
             notificationIntent.putExtra("User", UserLogged);
             notificationIntent.putExtra("WebConnection", Connection);
+            notificationIntent.putExtra("Restaurant", Rest);
+
             if(Tipo.equals("new_order"))
                 notificationIntent.putExtra("idOrdine", Integer.parseInt(Message.substring(Message.indexOf(":") + 2)));
 
@@ -203,6 +207,8 @@ public class Background extends Service {
             notificationIntent.putExtra("Cart", cartProducts);
             notificationIntent.putExtra("User", UserLogged);
             notificationIntent.putExtra("WebConnection", Connection);
+            notificationIntent.putExtra("Restaurant", Rest);
+
         }
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);

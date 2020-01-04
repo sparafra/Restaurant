@@ -207,8 +207,10 @@ public class activity_slider extends AppCompatActivity
                             ViewPager viewPager;
                             SlideAdapter myadapter;
                             viewPager = (ViewPager) findViewById(R.id.viewpager);
-                            myadapter = new SlideAdapter(activity_slider.this, listURL_images, lst_title, lst_description, lst_backgroundcolor, listURL_backgrounds);
+                            myadapter = new SlideAdapter(activity_slider.this, listURL_images, lst_title, lst_description, lst_backgroundcolor, listURL_backgrounds, listRestaurant);
                             viewPager.setAdapter(myadapter);
+
+
                         }
                     });
 
