@@ -133,8 +133,16 @@ public class SlideAdapter extends PagerAdapter {
         ImageView imgTransparent = (ImageView) view.findViewById(R.id.imageView);
         imgTransparent.setAlpha(200);
 
+        ImageView imgBackground = (ImageView) view.findViewById(R.id.background);
 
+        Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listBackgroundURL[position])).fit().into(imgBackground);
+
+        /*
+        try {
+            layoutslide.setBackground(new BitmapDrawable(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listBackgroundURL[position])).get()));
+        }catch (Exception e){e.printStackTrace();}
         //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+        /*
         new Thread(new Runnable() {
             public void run() {
                 try {
@@ -147,6 +155,8 @@ public class SlideAdapter extends PagerAdapter {
                 }
             }
         }).start();
+
+         */
         //imgslide.setImageResource(lst_images[position]);
 
         Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE,listURL_images[position])).into(imgslide);
