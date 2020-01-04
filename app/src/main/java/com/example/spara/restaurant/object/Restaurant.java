@@ -12,9 +12,10 @@ public class Restaurant implements Parcelable{
     String Mail = "";
     boolean Attivo = true;
     String LogoURL;
+    String BackgroundURL;
 
     public Restaurant(){}
-    public Restaurant(Long id, String Nome, String Indirizzo, String NumeroTelefono, String Mail, String LogoURL, boolean Attivo)
+    public Restaurant(Long id, String Nome, String Indirizzo, String NumeroTelefono, String Mail, String LogoURL, String BackgroundURL, boolean Attivo)
     {
         this.id = id;
         this.Nome = Nome;
@@ -22,6 +23,7 @@ public class Restaurant implements Parcelable{
         this.NumeroTelefono = NumeroTelefono;
         this.Mail = Mail;
         this.LogoURL = LogoURL;
+        this.BackgroundURL = BackgroundURL;
         this.Attivo = Attivo;
     }
     public Restaurant(Parcel in){
@@ -31,6 +33,7 @@ public class Restaurant implements Parcelable{
         this.NumeroTelefono = in.readString();
         this.Mail = in.readString();
         this.LogoURL = in.readString();
+        this.BackgroundURL = in.readString();
         this.Attivo = Boolean.valueOf(in.readString());
 
     }
@@ -41,6 +44,7 @@ public class Restaurant implements Parcelable{
         out.writeString(NumeroTelefono);
         out.writeString(Mail);
         out.writeString(LogoURL);
+        out.writeString(BackgroundURL);
         out.writeString(String.valueOf(Attivo));
 
     }
@@ -104,5 +108,13 @@ public class Restaurant implements Parcelable{
     }
     public void setLogoURL(String logoURL) {
         LogoURL = logoURL;
+    }
+
+    public String getBackgroundURL() {
+        return BackgroundURL;
+    }
+
+    public void setBackgroundURL(String backgroundURL) {
+        BackgroundURL = backgroundURL;
     }
 }

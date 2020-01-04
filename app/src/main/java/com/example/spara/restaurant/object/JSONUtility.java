@@ -332,7 +332,7 @@ public class JSONUtility {
             JSONArray jsonArray = new JSONArray(json);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-
+                System.out.println(obj);
                 Restaurant R = new Restaurant();
                 //R.setAttivo(obj.getBoolean("Active"));
                 R.setId(obj.getLong("id"));
@@ -341,6 +341,7 @@ public class JSONUtility {
                 R.setNome(obj.getString("Name"));
                 R.setNumeroTelefono(obj.getString("Telephone"));
                 R.setLogoURL(obj.getString("LogoURL"));
+                R.setBackgroundURL(obj.getString("BackgroundURL"));
 
                 list.add(R);
             }

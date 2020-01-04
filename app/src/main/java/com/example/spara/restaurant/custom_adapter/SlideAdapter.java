@@ -5,8 +5,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.palette.graphics.Palette;
 import androidx.viewpager.widget.PagerAdapter;
+
+import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +48,7 @@ public class SlideAdapter extends PagerAdapter {
     };
 
      */
+    public String[] listBackgroundURL;
 
     public String[] listURL_images;
 
@@ -83,12 +87,17 @@ public class SlideAdapter extends PagerAdapter {
     };
     */
 
-    public SlideAdapter(Context context, String[] listURLimg, String[] listTitle, String[] listDescription) {
+    public SlideAdapter(Context context, String[] listURLimg, String[] listTitle, String[] listDescription, int[] list_background, String[] listBackgroundURL) {
         this.context = context;
         this.listURL_images = listURLimg;
         this.lst_title = listTitle;
         this.lst_description = listDescription;
+        this.lst_backgroundcolor = list_background;
+        this.listBackgroundURL = listBackgroundURL;
         Connection = new WebConnection();
+
+
+
     }
 
     @Override
@@ -98,37 +107,39 @@ public class SlideAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return (view==(LinearLayout)object);
+        return (view==(ConstraintLayout)object);
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.slide,container,false);
-        LinearLayout layoutslide = (LinearLayout) view.findViewById(R.id.slidelinearlayout);
+        //LinearLayout layoutslide = (LinearLayout) view.findViewById(R.id.slidelinearlayout);
+        ConstraintLayout layoutslide = (ConstraintLayout) view.findViewById(R.id.slidelinearlayout);
+
         ImageView imgslide = (ImageView)  view.findViewById(R.id.slideimg);
         TextView txttitle= (TextView) view.findViewById(R.id.txttitle);
         TextView description = (TextView) view.findViewById(R.id.txtdescription);
 
-        try {
-            //lst_backgroundcolor[position] = getDominantColor(Picasso.get().load(listURL_images[position]).get());
-            System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE,listURL_images[position]));
+        ImageView imgTransparent = (ImageView) view.findViewById(R.id.imageView);
+        imgTransparent.setAlpha(200);
 
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        layoutslide.setBackgroundColor(getDominantColor(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listURL_images[position])).get()));
-                        System.out.println(getDominantColor(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listURL_images[position])).get()));
-                    }catch (Exception e){e.printStackTrace();}
 
+        //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listBackgroundURL[position]));
+                    layoutslide.setBackground(new BitmapDrawable(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listBackgroundURL[position])).get()));
+                    //layoutslide.setBackgroundColor(lst_backgroundcolor[position]);
+                    //layoutslide.setAlpha((float)0.2);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }).start();
-
-        }catch (Exception e){e.printStackTrace();}
-
-        //layoutslide.setBackgroundColor(getDominantColor(Picasso.get().load(listURL_images[position]).get()));
-
+            }
+        }).start();
         //imgslide.setImageResource(lst_images[position]);
+
         Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE,listURL_images[position])).into(imgslide);
 
         txttitle.setText(lst_title[position]);
@@ -157,7 +168,11 @@ public class SlideAdapter extends PagerAdapter {
                 return swatch2.getPopulation() - swatch1.getPopulation();
             }
         });
-        return swatches.size() > 0 ? swatches.get(0).getRgb() : getRandomColor();
+        if(swatches.size()>0)
+            return swatches.get(0).getRgb();
+        else
+            return getRandomColor();
+        //return swatches.size() > 0 ? swatches.get(0).getRgb() : getRandomColor();
     }
     public static int getRandomColor()
     {

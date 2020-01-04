@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -30,6 +31,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.palette.graphics.Palette;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.spara.restaurant.R;
@@ -42,11 +44,16 @@ import com.example.spara.restaurant.object.Setting;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
 import com.google.android.material.navigation.NavigationView;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 
 import static com.example.spara.restaurant.object.JSONUtility.downloadJSON;
 import static com.example.spara.restaurant.object.JSONUtility.fillRestaurants;
@@ -105,6 +112,8 @@ public class activity_slider extends AppCompatActivity
         //MY CODE
         Connection = new WebConnection();
 
+
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                 .permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -160,35 +169,82 @@ public class activity_slider extends AppCompatActivity
         }).start();
 
          */
-        String[] listURL_images;
-        String[] lst_title;
-        String[] lst_description;
 
-        try{
-            String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ALLLOCALS));
-            ArrayList<Restaurant> listRestaurant = fillRestaurants(tmpJSON);
-            listURL_images = new String[listRestaurant.size()];
-            lst_title = new String[listRestaurant.size()];
-            lst_description = new String[listRestaurant.size()];
 
-            for(int k=0; k<listRestaurant.size(); k++)
-            {
-                listURL_images[k] = listRestaurant.get(k).getLogoURL();
-                lst_title[k] = listRestaurant.get(k).getNome();
-                lst_description[k] = listRestaurant.get(k).getIndirizzo();
+        new Thread(new Runnable() {
+            public void run() {
+                String[] listURL_images;
+                String[] listURL_backgrounds;
+                String[] lst_title;
+                String[] lst_description;
+                int[] lst_backgroundcolor;
+                try{
+                    System.out.println(Connection.getURL(WebConnection.query.ALLLOCALS));
+                    String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ALLLOCALS));
+                    System.out.println(tmpJSON);
+                    ArrayList<Restaurant> listRestaurant = fillRestaurants(tmpJSON);
+                    listURL_images = new String[listRestaurant.size()];
+                    lst_title = new String[listRestaurant.size()];
+                    lst_description = new String[listRestaurant.size()];
+                    lst_backgroundcolor = new int[listRestaurant.size()];
+                    listURL_backgrounds = new String[listRestaurant.size()];
+
+                    for(int k=0; k<listRestaurant.size(); k++)
+                    {
+                        listURL_images[k] = listRestaurant.get(k).getLogoURL();
+                        listURL_backgrounds[k] = listRestaurant.get(k).getBackgroundURL();
+                        lst_title[k] = listRestaurant.get(k).getNome();
+                        lst_description[k] = listRestaurant.get(k).getIndirizzo();
+                        try {
+                            lst_backgroundcolor[k] = getDominantColor(Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listURL_images[k])).get());
+                        }
+                        catch (Exception e){e.printStackTrace();}
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Stuff that updates the UI
+                            ViewPager viewPager;
+                            SlideAdapter myadapter;
+                            viewPager = (ViewPager) findViewById(R.id.viewpager);
+                            myadapter = new SlideAdapter(activity_slider.this, listURL_images, lst_title, lst_description, lst_backgroundcolor, listURL_backgrounds);
+                            viewPager.setAdapter(myadapter);
+                        }
+                    });
+
+
+                }catch (Exception e){e.printStackTrace();}
             }
-
-            ViewPager viewPager;
-            SlideAdapter myadapter;
-            viewPager = (ViewPager) findViewById(R.id.viewpager);
-            myadapter = new SlideAdapter(this, listURL_images, lst_title, lst_description);
-            viewPager.setAdapter(myadapter);
-
-        }catch (Exception e){}
+        }).start();
 
 
 
     }
+    public static int getDominantColor(Bitmap bitmap) {
+        List<Palette.Swatch> swatchesTemp = Palette.from(bitmap).generate().getSwatches();
+        List<Palette.Swatch> swatches = new ArrayList<Palette.Swatch>(swatchesTemp);
+        Collections.sort(swatches, new Comparator<Palette.Swatch>() {
+            @Override
+            public int compare(Palette.Swatch swatch1, Palette.Swatch swatch2) {
+                return swatch2.getPopulation() - swatch1.getPopulation();
+            }
+        });
+        if(swatches.size()>0)
+            return swatches.get(0).getRgb();
+        else
+            return getRandomColor();
+        //return swatches.size() > 0 ? swatches.get(0).getRgb() : getRandomColor();
+    }
+    public static int getRandomColor()
+    {
+        Random rand = new Random();
+        int r = rand.nextInt(255);
+        int g = rand.nextInt(255);
+        int b = rand.nextInt(255);
+        return Color.rgb(r,g,b);
+
+    }
+
     @Override
     protected void onStart()
     {
