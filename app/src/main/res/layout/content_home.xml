@@ -31,7 +31,7 @@
         app:layout_constraintStart_toStartOf="parent"
 
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/burger" />
+        app:srcCompat="@drawable/bisignano" />
 
     <ImageView
         android:id="@+id/Panini_Fritti"

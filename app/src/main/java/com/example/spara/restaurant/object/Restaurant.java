@@ -2,8 +2,8 @@ package com.example.spara.restaurant.object;
 
 public class Restaurant {
 
-    static final Long id = Long.valueOf(1);
-    static final String Nome = "AlPachino";
+    static final Long id = Long.valueOf(8);
+    static final String Nome = "Panino Genuino";
     static final String Indirizzo = "Via G. Marconi, 82, 87036 Rende CS";
     static final String NumeroTelefono = "0981808080";
     static final String Mail = "";

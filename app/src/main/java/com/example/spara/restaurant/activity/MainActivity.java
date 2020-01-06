@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity
         TextView t1 = findViewById(R.id.indirizzo_main);
         Typeface typeface = Typeface.createFromAsset(getAssets(),"font/robotoregular.ttf");
         t1.setTypeface(typeface);
+        t1.setText(Restaurant.getIndirizzo());
 
         TextView Iscriviti = findViewById(R.id.iscriviti);
 
