@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity
 
         ImageView imgLogo = findViewById(R.id.logo);
 
+        t1.setText(Rest.getIndirizzo());
+
         Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE,Rest.getLogoURL())).into(imgLogo);
 
         new Thread(new Runnable() {
