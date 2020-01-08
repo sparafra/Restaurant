@@ -12,6 +12,7 @@ import android.os.Bundle;
 
 import com.example.spara.restaurant.object.Cart;
 import com.example.spara.restaurant.object.Ingredient;
+import com.example.spara.restaurant.object.Preference;
 import com.example.spara.restaurant.object.Product;
 import com.example.spara.restaurant.R;
 import com.example.spara.restaurant.object.Restaurant;
@@ -445,8 +446,11 @@ public class activity_personalizza extends AppCompatActivity
         }
         else if (id == R.id.nav_exit)
         {
-            savePreferences("", "", "", this);
-            startActivity(new Intent(activity_personalizza.this, MainActivity.class));
+            Preference.savePreferences("", "", "", this);
+            Intent I = new Intent(activity_personalizza.this, MainActivity.class);
+            I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+            startActivity(I);
             activity_personalizza.this.finish();
         }
 

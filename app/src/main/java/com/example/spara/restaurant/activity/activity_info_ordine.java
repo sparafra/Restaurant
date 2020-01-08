@@ -665,8 +665,12 @@ public class activity_info_ordine extends AppCompatActivity
         else if (id == R.id.nav_exit)
         {
             Preference.savePreferences("", "", "", this);
-            startActivity(new Intent(activity_info_ordine.this, MainActivity.class));
+            Intent I = new Intent(activity_info_ordine.this, MainActivity.class);
+            I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+            startActivity(I);
             activity_info_ordine.this.finish();
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_info_ordine);

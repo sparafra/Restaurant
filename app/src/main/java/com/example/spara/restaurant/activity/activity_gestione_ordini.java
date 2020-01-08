@@ -419,7 +419,10 @@ public class activity_gestione_ordini extends AppCompatActivity
         else if (id == R.id.nav_exit)
         {
             Preference.savePreferences("", "", "", this);
-            startActivity(new Intent(activity_gestione_ordini.this, MainActivity.class));
+            Intent I = new Intent(activity_gestione_ordini.this, MainActivity.class);
+            I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+            startActivity(I);
             activity_gestione_ordini.this.finish();
         }
 

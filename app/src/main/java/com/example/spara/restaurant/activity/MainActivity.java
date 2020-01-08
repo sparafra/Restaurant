@@ -109,8 +109,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //MY CODE
-        Connection = new WebConnection();
+        //Connection = new WebConnection();
         Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
+        Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
 
         if(Setting.getDebug())
         {
@@ -332,6 +333,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
                 Intent I = new Intent(MainActivity.this, activity_signin.class);
+                I.putExtra("Restaurant", Rest);
                 startActivity(I);
                 MainActivity.this.finish();
 
@@ -550,6 +552,13 @@ public class MainActivity extends AppCompatActivity
                 // Permission has already been granted
                 callPhone(Rest.getNumeroTelefono());
             }
+        }
+        else if(id == R.id.nav_exit)
+        {
+            Preference.savePreferences("", "", "", this);
+            Intent I = new Intent(MainActivity.this, activity_slider.class);
+            startActivity(I);
+            MainActivity.this.finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

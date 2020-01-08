@@ -130,6 +130,7 @@ public class activity_signin extends AppCompatActivity
         imgTransparent.setAlpha(230);
 
         Rest = (Restaurant) getIntent().getParcelableExtra("Restaurant");
+        Connection = (WebConnection) getIntent().getParcelableExtra("WebConnection");
 
         ConstraintLayout layoutslide = (ConstraintLayout) findViewById(R.id.content_signin);
 
@@ -215,6 +216,8 @@ public class activity_signin extends AppCompatActivity
                                     });
 
                                     Intent I = new Intent(activity_signin.this, MainActivity.class);
+                                    I.putExtra("WebConnection", Connection);
+                                    I.putExtra("Restaurant", Rest);
                                     startActivity(I);
                                     activity_signin.this.finish();
                                 }
@@ -318,6 +321,8 @@ public class activity_signin extends AppCompatActivity
                 if(Setting.getDebug())
                     System.out.println("BACK <--");
                 Intent I = new Intent(activity_signin.this, MainActivity.class);
+                I.putExtra("WebConnection", Connection);
+                I.putExtra("Restaurant", Rest);
                 startActivity(I);
                 activity_signin.this.finish();
 

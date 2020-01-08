@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import com.example.spara.restaurant.object.Cart;
 import com.example.spara.restaurant.R;
+import com.example.spara.restaurant.object.Preference;
 import com.example.spara.restaurant.object.Restaurant;
 import com.example.spara.restaurant.object.User;
 import com.example.spara.restaurant.object.WebConnection;
@@ -250,14 +251,20 @@ public class activity_map extends AppCompatActivity
         {
             if(!UserLogged.getNumeroTelefono().equals("")) {
 
-                savePreferences("", "", "", this);
-                startActivity(new Intent(activity_map.this, MainActivity.class));
+                Preference.savePreferences("", "", "", this);
+                Intent I = new Intent(activity_map.this, MainActivity.class);
+                I.putExtra("WebConnection" ,Connection);
+                I.putExtra("Restaurant" ,Rest);
+                startActivity(I);
                 activity_map.this.finish();
             }
             else{
                 Intent I = new Intent(activity_map.this, MainActivity.class);
+                I.putExtra("WebConnection" ,Connection);
+                I.putExtra("Restaurant" ,Rest);
                 startActivity(I);
                 activity_map.this.finish();
+
             }
         }
 

@@ -175,6 +175,7 @@ public class activity_home extends AppCompatActivity
         Intent intent = new Intent(this, background_alarm.class);
         intent.putExtra("UserNumber", UserLogged.getNumeroTelefono());
 
+
         pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
         /*
@@ -302,6 +303,7 @@ public class activity_home extends AppCompatActivity
                                 @Override
                                 public void run() {
                                     // Stuff that updates the UI
+                                    System.out.println(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listProducts.get(position).getImageURL()));
                                     Picasso.get().load(Connection.getURL(WebConnection.query.PRODUCTIMAGE, listProducts.get(position).getImageURL())).into(imgProduct);
                                     Animation animation1 = new AlphaAnimation(0.3f, 1.0f);
                                     animation1.setDuration(2000);
@@ -678,7 +680,10 @@ public class activity_home extends AppCompatActivity
         else if (id == R.id.nav_exit)
         {
             Preference.savePreferences("", "", "", this);
-            startActivity(new Intent(activity_home.this, MainActivity.class));
+            Intent I = new Intent(activity_home.this, MainActivity.class);
+            I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+            startActivity(I);
             activity_home.this.finish();
         }
 

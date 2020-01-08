@@ -663,8 +663,12 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         else if (id == R.id.nav_exit)
         {
             Preference.savePreferences("", "", "", this);
-            startActivity(new Intent(activity_carrello.this, MainActivity.class));
+            Intent I = new Intent(activity_carrello.this, MainActivity.class);
+            I.putExtra("WebConnection" ,Connection);
+            I.putExtra("Restaurant" ,Rest);
+            startActivity(I);
             activity_carrello.this.finish();
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_carrello);

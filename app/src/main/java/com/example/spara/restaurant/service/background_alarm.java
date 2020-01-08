@@ -61,6 +61,7 @@ public class background_alarm extends BroadcastReceiver {
                 }
 
                 Connection = new WebConnection();
+
                 loadPreferences(context);
                 String par = "NumeroTelefono=" + UserNumber;
                 String json = downloadJSON(Connection.getURL(WebConnection.query.SEARCHACCOUNTBYID, par));
