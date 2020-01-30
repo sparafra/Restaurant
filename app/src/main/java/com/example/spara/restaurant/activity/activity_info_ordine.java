@@ -187,6 +187,8 @@ public class activity_info_ordine extends AppCompatActivity
         }).start();
 
 
+
+
         if(UserLogged.getAmministratore())
         {
             if(Setting.getDebug())
@@ -203,7 +205,7 @@ public class activity_info_ordine extends AppCompatActivity
             @Override
             public void onSwitch(int position, String tabText) {
 
-                if (isRefreshing) {
+                if (!isRefreshing) {
                     if (Setting.getDebug())
                         System.out.println("CHANGING STATUS ORDER");
 
@@ -241,8 +243,8 @@ public class activity_info_ordine extends AppCompatActivity
                             new Thread(new Runnable() {
                                 public void run() {
                                     InsertIntoDB(Connection.getURL(WebConnection.query.UPDATEORDER, par));
-
-                                    refreshInfoOrder(O.getId());
+                                    pd.dismiss();
+                                    //refreshInfoOrder(O.getId());
                                 }
                             }).start();
                         }

@@ -396,6 +396,7 @@ implements NavigationView.OnNavigationItemSelectedListener, AlertDialogFragment.
         I.putExtra("Cart", cartProducts);
         I.putExtra("User", UserLogged);
         I.putExtra("WebConnection", Connection);
+        I.putExtra("Restaurant" ,Rest);
         startActivity(I);
         activity_carrello.this.finish();
     }

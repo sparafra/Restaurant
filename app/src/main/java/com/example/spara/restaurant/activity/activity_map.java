@@ -374,8 +374,11 @@ public class activity_map extends AppCompatActivity
         uiSettings.setMapToolbarEnabled(true);
         uiSettings.setCompassEnabled(true);
         uiSettings.setZoomControlsEnabled(true);
-
-        LatLng ny = new LatLng(39.3560725, 16.2376736);
+        LatLng ny;
+        if(Rest.getId() == 1)
+            ny = new LatLng(39.3560725, 16.2376736);
+        else
+            ny = new LatLng(39.3534562, 16.2359288);
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(ny);

@@ -87,27 +87,7 @@ public class activity_slider extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
-        /* //Mail Floating Action
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
 
-        /*
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        */
 
         //MY CODE
         Connection = new WebConnection();
@@ -145,30 +125,7 @@ public class activity_slider extends AppCompatActivity
 
         }
 
-        /*
-        new Thread(new Runnable() {
-            public void run() {
 
-                if(Setting.getDebug())
-                {
-                    System.out.println("NUMERO TELEFONO: " + NumeroTelefono);
-                    System.out.println("MAIL: " + Mail);
-                    System.out.println("PASSWORD: " + Password);
-                }
-
-
-
-                try{
-                    String tmpJSON = downloadJSON(Connection.getURL(WebConnection.query.ALLLOCALS));
-                    ArrayList<Restaurant> listRestaurant = fillRestaurants(tmpJSON);
-
-
-                }catch (Exception e){}
-
-            }
-        }).start();
-
-         */
 
 
         new Thread(new Runnable() {
