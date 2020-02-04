@@ -334,6 +334,7 @@ public class MainActivity extends AppCompatActivity
                 });
                 Intent I = new Intent(MainActivity.this, activity_signin.class);
                 I.putExtra("Restaurant", Rest);
+                I.putExtra("WebConnection", Connection);
                 startActivity(I);
                 MainActivity.this.finish();
 

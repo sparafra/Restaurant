@@ -6,7 +6,7 @@ import android.os.Parcelable;
 public class WebConnection extends Thread implements Parcelable  {
 
     //final String ipWebServer = "212.237.3.25";
-    final String ipWebServer = "192.168.1.2";
+    final String ipWebServer = "192.168.43.15";
 
 
     public enum query {
